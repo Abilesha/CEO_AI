@@ -1,0 +1,195 @@
+/* Analytics.css */
+
+.analytics {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.analytics__kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-6);
+}
+
+.analytics-kpi {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  transition: transform var(--transition-bounce), border-color var(--transition-normal);
+}
+
+.analytics-kpi:hover {
+  transform: translateY(-3px);
+  border-color: var(--color-border-glow);
+}
+
+.analytics-kpi__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.analytics-kpi__label {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.analytics-kpi__icon {
+  font-size: var(--text-base);
+}
+
+.analytics-kpi__value {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+}
+
+.analytics-kpi__trend {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+}
+
+.analytics-kpi__trend.positive { color: var(--color-success); }
+.analytics-kpi__trend.negative { color: var(--color-danger); }
+
+/* SVG Chart Layout */
+.analytics__charts-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: var(--space-6);
+}
+
+@media (max-width: 900px) {
+  .analytics__charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.analytics-chart-card {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.chart-title {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semi);
+}
+
+.chart-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.analytics-svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.svg-grid-line {
+  stroke: rgba(255, 255, 255, 0.04);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+}
+
+.svg-trend-path {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: drawLine 2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes drawLine {
+  to { stroke-dashoffset: 0; }
+}
+
+.chart-dot {
+  stroke: var(--color-bg-surface);
+  stroke-width: 3.5;
+  cursor: pointer;
+  transition: r var(--transition-fast);
+}
+
+.chart-dot:hover {
+  r: 9;
+}
+
+.chart-dot.primary { fill: var(--color-primary); }
+.chart-dot.accent  { fill: var(--color-accent); }
+.chart-dot.success { fill: var(--color-success); }
+
+.chart-legend {
+  display: flex;
+  gap: var(--space-4);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+/* Column Chart CSS */
+.chart-bar-wrapper {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  height: 200px;
+  padding: 0 var(--space-4);
+}
+
+.chart-bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  width: 50px;
+}
+
+.chart-bar-container {
+  width: 14px;
+  height: 150px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.chart-bar-fill {
+  width: 100%;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-full);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  position: relative;
+  transition: height 1s ease-in-out;
+  cursor: pointer;
+}
+
+.chart-bar-fill:hover {
+  filter: brightness(1.2);
+  box-shadow: var(--shadow-glow);
+}
+
+.chart-bar-val {
+  position: absolute;
+  top: -24px;
+  font-size: 10px;
+  font-weight: var(--weight-semi);
+  color: var(--color-text-primary);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.chart-bar-fill:hover .chart-bar-val {
+  opacity: 1;
+}
+
+.chart-bar-label {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  text-align: center;
+  white-space: nowrap;
+}

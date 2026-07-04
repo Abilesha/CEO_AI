@@ -8,6 +8,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { MainLayout } from '@layouts/MainLayout'
 import { HomePage } from '@pages/Home'
+import { AnalyticsPage } from '@pages/Analytics'
+import { ReportsPage } from '@pages/Reports'
+import { DecisionsPage } from '@pages/Decisions'
+import { TeamPage } from '@pages/Team'
+import { SettingsPage } from '@pages/Settings'
 
 function AppRouter() {
   return (
@@ -22,6 +27,46 @@ function AppRouter() {
           element={
             <MainLayout>
               <HomePage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/analytics"
+          element={
+            <MainLayout>
+              <AnalyticsPage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <MainLayout>
+              <ReportsPage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/decisions"
+          element={
+            <MainLayout>
+              <DecisionsPage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/team"
+          element={
+            <MainLayout>
+              <TeamPage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <MainLayout>
+              <SettingsPage />
             </MainLayout>
           }
         />

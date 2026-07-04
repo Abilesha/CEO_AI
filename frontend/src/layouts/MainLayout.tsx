@@ -6,6 +6,7 @@
  */
 
 import type { ReactNode } from 'react'
+import { NavLink, useLocation } from 'react-router-dom'
 import { useAppContext } from '@context/AppContext'
 import './MainLayout.css'
 
@@ -14,16 +15,20 @@ interface MainLayoutProps {
 }
 
 const NAV_ITEMS = [
-  { id: 'dashboard',   label: 'Dashboard',    icon: '⬡' },
-  { id: 'analytics',   label: 'Analytics',    icon: '◎' },
-  { id: 'decisions',   label: 'Decisions',    icon: '◈' },
-  { id: 'reports',     label: 'Reports',      icon: '▦' },
-  { id: 'team',        label: 'Team',         icon: '◑' },
-  { id: 'settings',    label: 'Settings',     icon: '◌' },
+  { path: '/',           label: 'Dashboard',    icon: '⬡' },
+  { path: '/analytics',   label: 'Analytics',    icon: '◎' },
+  { path: '/decisions',   label: 'Decisions',    icon: '◈' },
+  { path: '/reports',     label: 'Reports',      icon: '▦' },
+  { path: '/team',        label: 'Team',         icon: '◑' },
+  { path: '/settings',    label: 'Settings',     icon: '◌' },
 ]
 
 export function MainLayout({ children }: MainLayoutProps) {
   const { user, sidebarOpen, toggleSidebar } = useAppContext()
+  const location = useLocation()
+
+  // Dynamically map current route path to header title
+  const currentTitle = NAV_ITEMS.find((item) => item.path === location.pathname)?.label ?? 'Dashboard'
 
   return (
     <div className={`layout ${sidebarOpen ? 'layout--sidebar-open' : 'layout--sidebar-closed'}`}>
@@ -43,10 +48,16 @@ export function MainLayout({ children }: MainLayoutProps) {
 
         <nav className="sidebar__nav">
           {NAV_ITEMS.map((item) => (
-            <a key={item.id} href={`#${item.id}`} className="sidebar__nav-item">
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={({ isActive }) =>
+                `sidebar__nav-item ${isActive ? 'active' : ''}`
+              }
+            >
               <span className="sidebar__nav-icon">{item.icon}</span>
               {sidebarOpen && <span className="sidebar__nav-label">{item.label}</span>}
-            </a>
+            </NavLink>
           ))}
         </nav>
 
@@ -78,7 +89,7 @@ export function MainLayout({ children }: MainLayoutProps) {
         {/* Topbar */}
         <header className="topbar glass">
           <div className="topbar__left">
-            <h2 className="topbar__title">Dashboard</h2>
+            <h2 className="topbar__title">{currentTitle}</h2>
           </div>
           <div className="topbar__right">
             <div className="badge badge-success">● Live</div>
