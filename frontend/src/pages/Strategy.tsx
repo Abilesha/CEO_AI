@@ -1,92 +1,140 @@
 import { useState } from 'react'
+import './engine-forms.css'
 import './Strategy.css'
 
+const SECTORS = [
+  'B2B SaaS', 'FinTech', 'E-Commerce', 'Healthcare',
+  'EdTech', 'D2C Retail', 'PropTech', 'AgriTech',
+]
+
 export function StrategyPage() {
-  const [strategyInput, setStrategyInput] = useState({ name: 'AlphaCorp', sector: 'B2B SaaS' })
-  const [strategyOutput, setStrategyOutput] = useState<any>({
-    positioning: 'Executive niche positioning for "AlphaCorp". Focus marketing on ROI metrics rather than technical specs.',
-    pricing: 'Recommended Tier: base pricing of $1,450/month with 15 user seats included.',
-    tactics: 'Top channel priority: Direct Account-Based Marketing (ABM) via LinkedIn outreach.',
-  })
+  const [name, setName]     = useState('AlphaCorp')
+  const [sector, setSector] = useState('B2B SaaS')
   const [isSimulating, setIsSimulating] = useState(false)
+  const [output, setOutput] = useState<any>({
+    positioning: 'Executive niche positioning for "AlphaCorp". Focus marketing on ROI metrics rather than technical specs.',
+    pricing:     'Recommended Tier: base pricing of $1,450/month with 15 user seats included.',
+    tactics:     'Top channel priority: Direct Account-Based Marketing (ABM) via LinkedIn outreach.',
+  })
 
   const handleSimulate = () => {
     setIsSimulating(true)
     setTimeout(() => {
       setIsSimulating(false)
-      setStrategyOutput({
-        positioning: `Executive niche positioning for "${strategyInput.name}" in the ${strategyInput.sector} sector. Focus marketing on ROI metrics rather C-Suite time-savings.`,
-        pricing: `Recommended Tier: base pricing of $2,490/month with 20 user seats included, scaling at $60/user/month.`,
-        tactics: `Top channel priority: Direct Account-Based Marketing (ABM) via LinkedIn outreach + executive private events.`,
+      setOutput({
+        positioning: `Executive niche positioning for "${name}" in the ${sector} sector. Focus on C-Suite time-savings, not feature lists.`,
+        pricing:     `Recommended Tier: base pricing of $2,490/month with 20 seats. Scale at $60/user/month beyond that.`,
+        tactics:     `Top channel: Direct ABM via LinkedIn + exclusive executive private events for the ${sector} vertical.`,
       })
-    }, 1200)
+    }, 1400)
   }
 
   return (
-    <div className="strategy-page animate-fade-in">
-      <div className="strategy-header">
-        <h2 className="strategy-title">Strategy Engine ⚙️</h2>
-        <p className="strategy-subtitle">AI co-pilot for market research, brand positioning, pricing recommendations, and GTM design.</p>
+    <div
+      className="engine-page animate-fade-in"
+      style={{
+        '--eng-accent': 'linear-gradient(90deg, #8b5cf6, #a78bfa)',
+        '--eng-glow': 'rgba(139, 92, 246, 0.15)',
+        '--eng-focus-color': '#a78bfa',
+        '--eng-focus-ring': 'rgba(139, 92, 246, 0.2)',
+        '--eng-btn-bg': 'linear-gradient(135deg, #8b5cf6, #6d28d9)',
+        '--eng-btn-shadow': 'rgba(139, 92, 246, 0.45)',
+        '--eng-chip-bg': 'rgba(139, 92, 246, 0.12)',
+        '--eng-chip-color': '#a78bfa',
+        '--eng-chip-border': 'rgba(139, 92, 246, 0.3)',
+      } as React.CSSProperties}
+    >
+      {/* Header */}
+      <div className="engine-page-header">
+        <h2 className="engine-page-title">🧭 Strategy Engine</h2>
+        <p className="engine-page-subtitle">
+          AI co-pilot for market research, brand positioning, competitive pricing recommendations,
+          and GTM playbook design.
+        </p>
       </div>
 
-      <div className="strategy-grid">
-        <div className="strategy-form-panel glass">
-          <h3>Configure Strategy Parameters</h3>
-          <div className="form-group">
-            <label>Product / Business Name</label>
+      {/* Grid */}
+      <div className="engine-grid">
+
+        {/* ---- Form Panel ---- */}
+        <div className="engine-form-panel">
+          <span className="engine-form-panel-title">Strategy Parameters</span>
+
+          <div className="eng-field">
+            <label className="eng-label">
+              <span className="eng-label-icon">🏢</span>
+              Product / Business Name
+            </label>
             <input
               type="text"
-              className="form-input"
-              value={strategyInput.name}
-              onChange={(e) => setStrategyInput({ ...strategyInput, name: e.target.value })}
+              className="eng-input"
+              placeholder="e.g. AlphaCorp"
+              value={name}
+              onChange={e => setName(e.target.value)}
             />
           </div>
-          <div className="form-group">
-            <label>Market Sector</label>
-            <select
-              className="form-input"
-              value={strategyInput.sector}
-              onChange={(e) => setStrategyInput({ ...strategyInput, sector: e.target.value })}
-            >
-              <option value="B2B SaaS">B2B SaaS</option>
-              <option value="FinTech">FinTech</option>
-              <option value="E-Commerce">E-Commerce</option>
-              <option value="Healthcare">Healthcare</option>
-            </select>
+
+          <div className="eng-field">
+            <label className="eng-label">
+              <span className="eng-label-icon">🌐</span>
+              Market Sector
+            </label>
+            <div className="eng-select-wrapper">
+              <select
+                className="eng-select"
+                value={sector}
+                onChange={e => setSector(e.target.value)}
+              >
+                {SECTORS.map(s => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+            <div className="eng-chip-row">
+              <span className="eng-chip">📍 {sector}</span>
+            </div>
           </div>
+
           <button
-            className="btn btn-primary"
+            className={`eng-cta-btn${isSimulating ? ' loading' : ''}`}
             onClick={handleSimulate}
             disabled={isSimulating}
           >
-            {isSimulating ? 'Synthesizing Strategy...' : 'Design GTM Strategy'}
+            <span className="eng-cta-btn-inner">
+              {isSimulating ? '⬡ Synthesizing Strategy...' : '🧭 Design GTM Strategy'}
+            </span>
           </button>
         </div>
 
-        <div className="strategy-output-panel glass">
-          <h3>📊 AI Strategy Recommendation</h3>
+        {/* ---- Output Panel ---- */}
+        <div className="engine-output-panel">
+          <div className="engine-output-title">
+            📊 AI Strategy Recommendation
+          </div>
+
           {isSimulating ? (
-            <div className="loading-state">
-              <div className="spinner">⬡</div>
-              <span>Analyzing market data...</span>
+            <div className="engine-loading">
+              <div className="engine-loading-orb">🧭</div>
+              <span className="engine-loading-text">Analysing market data and positioning vectors…</span>
             </div>
           ) : (
-            <div className="output-content">
-              <div className="output-row">
-                <strong>Brand Positioning:</strong>
-                <p>{strategyOutput.positioning}</p>
+            <div className="engine-result-stack">
+              <div className="engine-result-card">
+                <span className="engine-result-label">🎯 Brand Positioning</span>
+                <p className="engine-result-value">{output.positioning}</p>
               </div>
-              <div className="output-row">
-                <strong>Pricing Suggestion:</strong>
-                <p>{strategyOutput.pricing}</p>
+              <div className="engine-result-card">
+                <span className="engine-result-label">💲 Pricing Suggestion</span>
+                <p className="engine-result-value">{output.pricing}</p>
               </div>
-              <div className="output-row">
-                <strong>Sales & Marketing Channels:</strong>
-                <p>{strategyOutput.tactics}</p>
+              <div className="engine-result-card">
+                <span className="engine-result-label">📣 Sales &amp; Marketing Channels</span>
+                <p className="engine-result-value">{output.tactics}</p>
               </div>
             </div>
           )}
         </div>
+
       </div>
     </div>
   )
