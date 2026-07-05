@@ -168,7 +168,7 @@ export function CustomerSuccessPage() {
         const chartMarker = '[CHART:'
         if (replyText.includes(chartMarker)) {
           const startIdx = replyText.indexOf(chartMarker)
-          const endIdx = replyText.indexOf(']', startIdx)
+          const endIdx = replyText.lastIndexOf(']')
           if (endIdx > startIdx) {
             const jsonStr = replyText.substring(startIdx + chartMarker.length, endIdx).trim()
             try {
@@ -228,7 +228,20 @@ export function CustomerSuccessPage() {
               {chatHistory.map((msg, i) => (
                 <div key={i} className={`chat-bubble-container ${msg.sender}`}>
                   <div className={`chat-bubble-wrapper ${msg.sender}`}>
-                    <div className={`chat-bubble ${msg.sender}`}>{msg.text}</div>
+                    {msg.sender === 'bot' && i > 0 && (
+                      <div className="agent-route-badge animate-fade-in" style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px', fontSize: '9px', fontWeight: 500 }}>
+                        <span style={{ color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', padding: '1px 5px', borderRadius: '4px', border: '1px solid rgba(16, 185, 129, 0.15)' }}>check_db</span>
+                        <span style={{ color: 'var(--color-text-muted)' }}>➔</span>
+                        {(msg.chart || msg.text.toLowerCase().includes('database') || msg.text.toLowerCase().includes('overview') || msg.text.toLowerCase().includes('retrieved')) && (
+                          <>
+                            <span style={{ color: '#06b6d4', background: 'rgba(6, 182, 212, 0.1)', padding: '1px 5px', borderRadius: '4px', border: '1px solid rgba(6, 182, 212, 0.15)' }}>query_postgresql</span>
+                            <span style={{ color: 'var(--color-text-muted)' }}>➔</span>
+                          </>
+                        )}
+                        <span style={{ color: '#a78bfa', background: 'rgba(139, 92, 246, 0.1)', padding: '1px 5px', borderRadius: '4px', border: '1px solid rgba(139, 92, 246, 0.15)' }}>call_llm</span>
+                      </div>
+                    )}
+                    <div className={`chat-bubble ${msg.sender}`} style={{ whiteSpace: 'pre-line' }}>{msg.text}</div>
                     {msg.chart && <VisualChart chart={msg.chart} />}
                   </div>
                 </div>
