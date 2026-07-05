@@ -1,0 +1,213 @@
+import { useState } from 'react'
+import './engine-forms.css'
+import './Boardroom.css'
+
+interface DebateTurn {
+  role: string
+  name: string
+  avatar: string
+  text: string
+  color: string
+}
+
+export function BoardroomPage() {
+  const [query, setQuery] = useState('How can I increase revenue next quarter?')
+  const [isDebating, setIsDebating] = useState(false)
+  const [debateStep, setDebateStep] = useState(0)
+  const [debateHistory, setDebateHistory] = useState<DebateTurn[]>([])
+
+  const debateTimeline: DebateTurn[] = [
+    {
+      role: 'Marketing Agent',
+      name: 'Ananya (Marketing Exec)',
+      avatar: '📢',
+      text: 'We should increase our Instagram and Meta ad spend by 20%. Indian festivals are approaching, and acquiring high top-of-funnel traffic now is vital.',
+      color: '#ec4899',
+    },
+    {
+      role: 'Finance Agent',
+      name: 'Vikram (Chief Financial Officer)',
+      avatar: '💸',
+      text: 'Ad spend is already at an all-time high, accounting for 38% of our operating expenses. We cannot risk customer acquisition costs scaling faster than lifetime value. Budget must be constrained.',
+      color: '#f59e0b',
+    },
+    {
+      role: 'Sales Agent',
+      name: 'Rahul (Sales Director)',
+      avatar: '💰',
+      text: 'Raw lead quantity is not our bottleneck — lead conversion quality is. Instead of burning budget on ads, we should introduce high-intent bundle offers to increase average order value (AOV).',
+      color: '#10b981',
+    },
+    {
+      role: 'Customer Success Agent',
+      name: 'Priyanka (CS Lead)',
+      avatar: '🤝',
+      text: 'Acquiring new clients in India currently costs 5x more than retaining existing ones. We can generate immediate expansion revenue by launching a customer loyalty and upgrade campaign.',
+      color: '#fb923c',
+    },
+  ]
+
+  const handleStartDebate = () => {
+    setIsDebating(true)
+    setDebateStep(0)
+    setDebateHistory([])
+
+    // Trigger step-by-step debate turns simulation
+    let currentStep = 0
+    const interval = setInterval(() => {
+      if (currentStep < debateTimeline.length) {
+        setDebateHistory(prev => [...prev, debateTimeline[currentStep]])
+        setDebateStep(currentStep + 1)
+        currentStep++
+      } else {
+        clearInterval(interval)
+        setIsDebating(false)
+        setDebateStep(5) // Debate complete
+      }
+    }, 1800)
+  }
+
+  return (
+    <div
+      className="engine-page animate-fade-in"
+      style={{
+        '--eng-accent': 'linear-gradient(90deg, #8b5cf6, #34d399)',
+        '--eng-glow': 'rgba(139, 92, 246, 0.15)',
+        '--eng-focus-color': '#a78bfa',
+        '--eng-focus-ring': 'rgba(139, 92, 246, 0.2)',
+        '--eng-btn-bg': 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
+        '--eng-btn-shadow': 'rgba(139, 92, 246, 0.4)',
+        '--eng-chip-bg': 'rgba(139, 92, 246, 0.12)',
+        '--eng-chip-color': '#a78bfa',
+        '--eng-chip-border': 'rgba(139, 92, 246, 0.3)',
+      } as React.CSSProperties}
+    >
+      {/* Header */}
+      <div className="engine-page-header">
+        <h2 className="engine-page-title">🧠 AI Boardroom</h2>
+        <p className="engine-page-subtitle">
+          A Virtual Executive Team that debates and resolves conflicting priorities before presenting the final business decision.
+        </p>
+      </div>
+
+      <div className="boardroom-layout">
+        {/* Left Column: Query Console */}
+        <div className="engine-form-panel query-console">
+          <span className="engine-form-panel-title">CEO Decision Console</span>
+
+          <div className="eng-field">
+            <label className="eng-label">
+              <span className="eng-label-icon">💬</span>
+              Enter Business Query
+            </label>
+            <textarea
+              className="eng-input boardroom-textarea"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              disabled={isDebating}
+              placeholder="e.g. How can we increase revenue next quarter?"
+            />
+          </div>
+
+          <button
+            className={`eng-cta-btn ${isDebating ? 'loading' : ''}`}
+            onClick={handleStartDebate}
+            disabled={isDebating || !query.trim()}
+          >
+            <span className="eng-cta-btn-inner">
+              {isDebating ? '⬡ Debate in Progress...' : '🧠 Convene Boardroom Debate'}
+            </span>
+          </button>
+
+          {/* Execs attending */}
+          <div className="boardroom-members glass">
+            <h5>Executive Board Members Attending:</h5>
+            <div className="member-icons-grid">
+              <div className="member-chip" style={{ borderColor: '#ec4899' }}>📢 Marketing</div>
+              <div className="member-chip" style={{ borderColor: '#10b981' }}>💰 Sales</div>
+              <div className="member-chip" style={{ borderColor: '#f59e0b' }}>💸 Finance</div>
+              <div className="member-chip" style={{ borderColor: '#fb923c' }}>🤝 Customer Success</div>
+              <div className="member-chip" style={{ borderColor: '#22d3ee' }}>⚙️ Strategy</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Debate Chamber */}
+        <div className="engine-output-panel debate-chamber">
+          <div className="engine-output-title">
+            🎙️ AI Executive Debate Chamber
+            {isDebating && <span className="debate-active-badge">● Debating</span>}
+          </div>
+
+          {debateHistory.length === 0 && !isDebating && (
+            <div className="boardroom-placeholder">
+              <div className="placeholder-icon">🧠</div>
+              <p>Convene the AI Boardroom to witness the virtual executive debate and resolve conflicts in real-time.</p>
+            </div>
+          )}
+
+          {/* Transcript Feed */}
+          <div className="debate-transcript-feed">
+            {debateHistory.map((turn, i) => (
+              <div key={i} className="debate-turn-card glass" style={{ borderLeftColor: turn.color }}>
+                <div className="turn-header">
+                  <span className="turn-avatar" style={{ background: `${turn.color}15`, color: turn.color }}>
+                    {turn.avatar}
+                  </span>
+                  <div className="turn-identity">
+                    <span className="turn-name">{turn.name}</span>
+                    <span className="turn-role" style={{ color: turn.color }}>{turn.role}</span>
+                  </div>
+                </div>
+                <p className="turn-text">{turn.text}</p>
+              </div>
+            ))}
+
+            {isDebating && (
+              <div className="debate-turn-card typing-placeholder glass">
+                <span className="typing-dot" />
+                <span className="typing-dot" />
+                <span className="typing-dot" />
+              </div>
+            )}
+
+            {/* Resolved Strategy decision card */}
+            {debateStep === 5 && (
+              <div className="boardroom-consensus-section animate-slide-up">
+                <div className="strategy-resolution-header">
+                  <span className="resolution-icon">⚙️</span>
+                  <div>
+                    <span className="resolution-label">Resolution Agent (Strategy)</span>
+                    <span className="resolution-status">Consensus Synthesized</span>
+                  </div>
+                </div>
+
+                <div className="resolution-body glass">
+                  <h4 className="resolution-title">📋 Revenue Growth Plan</h4>
+                  <ol className="resolution-steps">
+                    <li><strong>Launch bundle offer</strong>: Address conversion blockers by packaging high-margin add-ons with standard subscriptions.</li>
+                    <li><strong>Run retargeting campaign</strong>: Focus marketing on high-intent cart abandoners to boost ROI.</li>
+                    <li><strong>Cap ad spend increase at 10%</strong>: Maintain capital efficiency under Finance constraints.</li>
+                  </ol>
+
+                  <div className="resolution-impact-row">
+                    <div className="impact-badge positive">
+                      <span className="impact-badge-lbl">Expected Impact</span>
+                      <span className="impact-badge-val">Revenue +14%</span>
+                    </div>
+                    <div className="impact-badge info">
+                      <span className="impact-badge-lbl">Confidence Score</span>
+                      <span className="impact-badge-val">87%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default BoardroomPage

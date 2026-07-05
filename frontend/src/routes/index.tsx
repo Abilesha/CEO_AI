@@ -18,6 +18,13 @@ import { MarketingPage } from '@pages/Marketing'
 import { LeadGenPage } from '@pages/LeadGen'
 import { SalesPage } from '@pages/Sales'
 import { CustomerSuccessPage } from '@pages/CustomerSuccess'
+import { SchedulePage } from '@pages/Schedule'
+import { BoardroomPage } from '@pages/Boardroom'
+import { SimulatorPage } from '@pages/Simulator'
+import { CrisisPage } from '@pages/Crisis'
+import { ReportsPage } from '@pages/Reports'
+import { DecisionsPage } from '@pages/Decisions'
+import { TeamPage } from '@pages/Team'
 import './index.css'
 
 /* ---- Loading Spinner Overlay ---- */
@@ -153,11 +160,81 @@ function AppRouter() {
           }
         />
         <Route
+          path="/boardroom"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <BoardroomPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/simulator"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <SimulatorPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/crisis"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <CrisisPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/schedule"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <SchedulePage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/settings"
           element={
             <ProtectedRoute>
               <MainLayout>
                 <SettingsPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <ReportsPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/decisions"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <DecisionsPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/team"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <TeamPage />
               </MainLayout>
             </ProtectedRoute>
           }

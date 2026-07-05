@@ -1,0 +1,242 @@
+/* ---- AI Live Button ---- */
+.ai-live-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 99px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.02em;
+}
+.ai-live-btn:hover {
+  background: rgba(16, 185, 129, 0.16);
+  border-color: rgba(16, 185, 129, 0.5);
+}
+
+.live-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
+  animation: livePulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+/* ---- AI Live Dropdown Panel ---- */
+.ai-live-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 340px;
+  border-radius: 16px;
+  border: 1px solid rgba(16,185,129,0.2);
+  padding: 1.25rem;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ai-live-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ai-live-panel-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.ai-live-close {
+  background: none;
+  border: none;
+  color: rgba(148,163,184,0.6);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.2s;
+}
+.ai-live-close:hover { color: #f1f5f9; }
+
+.ai-live-signals {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.ai-signal-row {
+  display: grid;
+  grid-template-columns: 10px 1fr 36px 70px 30px;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ai-signal-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.ai-signal-dot.active  { background: #10b981; box-shadow: 0 0 5px #10b981; animation: livePulse 2s ease-in-out infinite; }
+.ai-signal-dot.standby { background: #fbbf24; box-shadow: 0 0 5px #fbbf24; }
+
+.ai-signal-name {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: rgba(203,213,225,0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ai-signal-latency {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: rgba(148,163,184,0.5);
+  text-align: right;
+}
+
+.ai-signal-bar {
+  height: 4px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.ai-signal-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #10b981, #06b6d4);
+  transition: width 0.6s ease;
+}
+
+.ai-signal-pct {
+  font-size: 0.68rem;
+  color: #34d399;
+  font-weight: 600;
+  text-align: right;
+}
+
+.ai-live-footer {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding-top: 0.75rem;
+  font-size: 0.72rem;
+  color: rgba(148,163,184,0.55);
+}
+.ai-live-footer strong { font-weight: 600; color: rgba(203,213,225,0.85); }
+
+/* ---- New Insight Modal ---- */
+.insight-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(6px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.insight-modal {
+  width: 100%;
+  max-width: 460px;
+  padding: 1.75rem;
+  border-radius: 20px;
+  border: 1px solid rgba(139,92,246,0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.insight-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.insight-modal-icon { font-size: 1.5rem; }
+
+.insight-modal-header h3 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  flex: 1;
+}
+
+.insight-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 90px;
+  line-height: 1.5;
+}
+
+.insight-form-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 0.25rem;
+}
+
+.insight-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.insight-success-icon { font-size: 2.5rem; }
+
+.insight-success p {
+  font-size: 0.9rem;
+  color: #34d399;
+  font-weight: 600;
+}
+
+/* form-input / form-select used from Reports.css but also needed here */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.form-group label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(148,163,184,0.6);
+}
+.form-input, .form-select {
+  padding: 0.6rem 0.85rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 9px;
+  color: #f1f5f9;
+  font-size: 0.83rem;
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+.form-input:focus, .form-select:focus { border-color: rgba(139,92,246,0.4); }
+.form-select option { background: #13131f; }

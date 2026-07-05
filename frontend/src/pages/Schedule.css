@@ -1,0 +1,194 @@
+/* Schedule.css — Premium Automation Scheduler */
+
+.schedule-grid-container {
+  grid-template-columns: 1fr 1.4fr !important;
+}
+
+@media (max-width: 1024px) {
+  .schedule-grid-container {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Toast notification */
+.sched-toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  padding: 0.85rem 1.5rem;
+  border-radius: 12px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #34d399;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  z-index: 1000;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Active schedule card layout */
+.schedule-card-full {
+  padding: 1rem 1.25rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  transition: all 0.25s ease;
+  animation: resultSlide 0.3s ease forwards;
+}
+
+.schedule-card-full:hover {
+  border-color: rgba(139, 92, 246, 0.25);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.sched-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow: hidden;
+}
+
+.sched-card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sched-card-icon {
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.sched-card-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sched-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.sched-badge {
+  font-size: 0.68rem;
+  color: rgba(148, 163, 184, 0.7);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.15rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sched-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-shrink: 0;
+}
+
+/* Control buttons */
+.sched-status-toggle, .sched-delete {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+}
+
+.sched-status-toggle.active {
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.2);
+  background: rgba(52, 211, 153, 0.04);
+}
+
+.sched-status-toggle.paused {
+  color: rgba(148, 163, 184, 0.5);
+  border-color: rgba(255, 255, 255, 0.03);
+}
+
+.sched-status-toggle:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.sched-delete {
+  color: rgba(148, 163, 184, 0.7);
+}
+
+.sched-delete:hover {
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.3);
+  background: rgba(248, 113, 113, 0.06);
+  transform: scale(1.05);
+}
+
+/* System Console Panel */
+.console-panel {
+  margin-top: 1rem;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+
+.console-header {
+  padding: 0.65rem 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(148, 163, 184, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.console-blink {
+  width: 8px;
+  height: 8px;
+  background: #34d399;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #34d399;
+  animation: livePulse 1.8s infinite ease-in-out;
+}
+
+.console-body {
+  padding: 0.85rem;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 0.7rem;
+  max-height: 180px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.console-row {
+  line-height: 1.5;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.console-row.success .console-msg { color: #34d399; }
+.console-row.info .console-msg { color: #22d3ee; }
+.console-row.warning .console-msg { color: #fbbf24; }
+
+.console-time { color: rgba(148, 163, 184, 0.45); }
+.console-engine { color: #a78bfa; font-weight: 600; }
+.console-msg { color: #e2e8f0; flex: 1; min-width: 250px; }

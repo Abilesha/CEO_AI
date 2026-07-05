@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAppContext } from '@context/AppContext'
 import './Home.css'
 
@@ -6,7 +8,7 @@ const KPI_CARDS = [
   {
     id: 'revenue',
     label: 'Total Revenue',
-    value: '$4.2M',
+    value: '₹4.2M',
     change: '+18.4%',
     positive: true,
     icon: '💰',
@@ -53,7 +55,7 @@ const INSIGHTS = [
   {
     id: '1',
     title: 'Q3 Revenue Opportunity',
-    summary: 'AI has identified a $340K upsell opportunity in the APAC region based on engagement patterns.',
+    summary: 'AI has identified a ₹3.4L upsell opportunity in the regional enterprise accounts based on contract renewal models.',
     category: 'Revenue',
     priority: 'high',
     time: '2 hours ago',
@@ -62,7 +64,7 @@ const INSIGHTS = [
   {
     id: '2',
     title: 'Supply Chain Alert',
-    summary: 'Projected 12% delay in component delivery. Recommend activating secondary supplier protocol.',
+    summary: 'Projected 12% delay in component delivery. Recommend activating secondary supplier in Chennai hub.',
     category: 'Operations',
     priority: 'critical',
     time: '4 hours ago',
@@ -116,6 +118,12 @@ function Sparkline({ data, color }: { data: number[]; color: string }) {
 
 export function HomePage() {
   const { user } = useAppContext()
+  const navigate = useNavigate()
+  const [showBrief, setShowBrief] = useState(false)
+  
+  // Audio playback simulator for brief
+  const [isPlayingBrief, setIsPlayingBrief] = useState(false)
+
 
   const hour = new Date().getHours()
   const greeting =
@@ -140,14 +148,106 @@ export function HomePage() {
           </p>
         </div>
         <div className="home__hero-actions">
-          <button className="btn btn-primary" id="home-brief-btn">
+          <button 
+            className={`btn ${showBrief ? 'btn-primary' : 'btn-primary-outline'}`} 
+            id="home-brief-btn"
+            onClick={() => setShowBrief(true)}
+          >
             ⬡ Daily Brief
           </button>
-          <button className="btn btn-ghost" id="home-schedule-btn">
+          <button 
+            className="btn btn-ghost" 
+            id="home-schedule-btn"
+            onClick={() => navigate('/schedule')}
+          >
             ◌ Schedule
           </button>
         </div>
       </section>
+
+      {/* ---- Interactive Overlays (Daily Brief & Schedule Drawers) ---- */}
+      {showBrief && (
+        <div className="home-drawer-overlay animate-fade-in" onClick={() => setShowBrief(false)}>
+          <div className="home-drawer glass animate-slide-left" onClick={e => e.stopPropagation()}>
+            <div className="drawer-header">
+              <h3 className="drawer-title">⬡ Executive Daily Brief</h3>
+              <button className="drawer-close" onClick={() => setShowBrief(false)}>×</button>
+            </div>
+            <div className="drawer-content">
+              <div className="brief-welcome">
+                <span className="brief-date">{new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                <p>Hello {user?.fullName || 'Subasree'}, here is your synthesized executive briefing compiled from active market intelligence signals.</p>
+              </div>
+
+              {/* Audio Voice Simulation */}
+              <div className="brief-voice-widget glass">
+                <div className="voice-info">
+                  <span className="voice-icon">🎙️</span>
+                  <div>
+                    <span className="voice-label">AI Audio Briefing</span>
+                    <span className="voice-status">{isPlayingBrief ? 'Streaming briefing audio...' : 'Audio summary ready (1:45)'}</span>
+                  </div>
+                </div>
+                <button 
+                  className={`voice-play-btn ${isPlayingBrief ? 'playing' : ''}`}
+                  onClick={() => setIsPlayingBrief(!isPlayingBrief)}
+                >
+                  {isPlayingBrief ? '⏸ Pause' : '▶ Play Voice Brief'}
+                </button>
+                {isPlayingBrief && (
+                  <div className="audio-visualizer">
+                    <span className="bar animate-bar-1"></span>
+                    <span className="bar animate-bar-2"></span>
+                    <span className="bar animate-bar-3"></span>
+                    <span className="bar animate-bar-4"></span>
+                    <span className="bar animate-bar-5"></span>
+                  </div>
+                )}
+              </div>
+
+              <div className="brief-section">
+                <h4>🚨 Critical Priorities</h4>
+                <div className="brief-card alert border-red">
+                  <div className="brief-card-header">
+                    <strong>Supply Chain Risk</strong>
+                    <span className="badge badge-danger">Critical</span>
+                  </div>
+                  <p>12% delivery delay forecasted for regional shipments. Chennai supplier backup contract drafts synthesized in Strategy tab.</p>
+                </div>
+              </div>
+
+              <div className="brief-section">
+                <h4>💡 Opportunity Signals</h4>
+                <div className="brief-card border-purple">
+                  <div className="brief-card-header">
+                    <strong>Upsell Target Identified</strong>
+                    <span className="badge badge-warning">High</span>
+                  </div>
+                  <p>Analyzed contract metrics point to a ₹3.4L upsell opportunity across 4 local account portfolios. Recommended hooks generated in Lead Gen.</p>
+                </div>
+              </div>
+
+              <div className="brief-section">
+                <h4>🚀 System Summary</h4>
+                <div className="brief-stats-grid">
+                  <div className="brief-stat-item">
+                    <span className="stat-num">48</span>
+                    <span className="stat-desc">Parsed Signals</span>
+                  </div>
+                  <div className="brief-stat-item">
+                    <span className="stat-num">99.4%</span>
+                    <span className="stat-desc">AI Accuracy</span>
+                  </div>
+                  <div className="brief-stat-item">
+                    <span className="stat-num">3</span>
+                    <span className="stat-desc">Actions Pending</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ---- KPI Cards ---- */}
       <section className="home__kpis">

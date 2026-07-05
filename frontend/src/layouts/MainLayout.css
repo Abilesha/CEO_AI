@@ -8,7 +8,7 @@
 }
 
 .layout--sidebar-open {
-  grid-template-columns: 260px 1fr;
+  grid-template-columns: 280px 1fr;
 }
 
 .layout--sidebar-closed {
@@ -26,7 +26,7 @@
   flex-direction: column;
   background: linear-gradient(180deg, #0f0f1e 0%, #0a0a14 60%, #0d0d1a 100%);
   border-right: 1px solid rgba(139, 92, 246, 0.15);
-  padding: 1.5rem 0.75rem;
+  padding: 1.25rem 0.875rem 1rem;
   overflow: hidden;
   z-index: 50;
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
@@ -100,10 +100,13 @@
   font-size: 0.6rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: rgba(148, 163, 184, 0.4);
-  padding: 0.5rem 0.5rem 0.25rem;
-  margin-top: 0.5rem;
+  letter-spacing: 0.14em;
+  color: rgba(148, 163, 184, 0.45);
+  padding: 0.25rem 0.5rem 0.2rem;
+  margin-top: 1rem;
+  margin-bottom: 0.15rem;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  padding-top: 0.85rem;
 }
 
 /* ---- Nav ---- */
@@ -111,10 +114,11 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.15rem;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: none;
+  padding-right: 2px;
 }
 
 .sidebar__nav::-webkit-scrollbar {
@@ -126,7 +130,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.65rem 0.75rem;
+  padding: 0.6rem 0.75rem;
   border-radius: 10px;
   color: rgba(148, 163, 184, 0.8);
   font-size: 0.85rem;
@@ -136,6 +140,7 @@
   white-space: nowrap;
   position: relative;
   overflow: hidden;
+  min-height: 40px;
 }
 
 .sidebar__nav-item::before {
@@ -173,8 +178,8 @@
 .sidebar__engine-slot {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.6rem 0.75rem;
+  gap: 0.8rem;
+  padding: 0.55rem 0.75rem;
   border-radius: 10px;
   text-decoration: none;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -183,6 +188,7 @@
   position: relative;
   overflow: hidden;
   border: 1px solid transparent;
+  min-height: 52px;
 }
 
 .sidebar__engine-slot:hover {
@@ -244,26 +250,32 @@
 .engine-slot__info {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 3px;
   overflow: hidden;
+  flex: 1;
+  min-width: 0;
 }
 
 .engine-slot__name {
-  font-size: 0.82rem;
+  font-size: 0.83rem;
   font-weight: 600;
   transition: color 0.2s ease;
+  color: rgba(203, 213, 225, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sidebar__engine-slot:hover .engine-slot__name { color: #f1f5f9; }
 .sidebar__engine-slot.active .engine-slot__name { color: #a78bfa; }
 
 .engine-slot__hint {
-  font-size: 0.65rem;
-  color: rgba(148, 163, 184, 0.45);
+  font-size: 0.68rem;
+  color: rgba(148, 163, 184, 0.42);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 150px;
+  line-height: 1.3;
 }
 
 /* Live dot indicator */
