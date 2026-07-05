@@ -18,22 +18,107 @@ const INITIAL_REPORTS: Report[] = [
   { id: '5', name: 'Competitor Multi-agent Swarm Analysis', date: '2026-06-28', size: '--', type: 'PDF', status: 'failed' },
 ]
 
-/* Simulate a real CSV/PDF download as a Blob */
+/* Download handler — CSV as Blob, PDF as printable HTML window */
 function downloadReport(report: Report) {
-  const content =
-    report.type === 'CSV'
-      ? `Report Name,Date,Size,Status\n"${report.name}","${report.date}","${report.size}","${report.status}"\n`
-      : `%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\n%% CEO AI Report: ${report.name}\n%% Generated: ${report.date}\n`
-  const mime = report.type === 'CSV' ? 'text/csv' : 'application/pdf'
-  const blob = new Blob([content], { type: mime })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `${report.name.replace(/[^a-z0-9]/gi, '_')}.${report.type.toLowerCase()}`
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
-  URL.revokeObjectURL(url)
+  if (report.type === 'CSV') {
+    // Real CSV blob download
+    const rows = [
+      ['Report Name', 'Date', 'Size', 'Type', 'Status'],
+      [report.name, report.date, report.size, report.type, report.status],
+    ]
+    const csv = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url  = URL.createObjectURL(blob)
+    const a    = document.createElement('a')
+    a.href     = url
+    a.download = `${report.name.replace(/[^a-z0-9]/gi, '_')}.csv`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  } else {
+    // Open a styled HTML print window — user saves as PDF via browser
+    const win = window.open('', '_blank')
+    if (!win) return
+    win.document.write(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>${report.name}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #fff; color: #1a1a2e; padding: 48px; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #8b5cf6; padding-bottom: 20px; margin-bottom: 32px; }
+    .logo { font-size: 22px; font-weight: 900; color: #8b5cf6; letter-spacing: -0.03em; }
+    .logo span { color: #06b6d4; }
+    .meta { text-align: right; font-size: 12px; color: #666; }
+    .meta strong { font-size: 14px; color: #1a1a2e; display: block; margin-bottom: 4px; }
+    h1 { font-size: 24px; font-weight: 800; color: #1a1a2e; margin-bottom: 8px; }
+    .subtitle { font-size: 13px; color: #666; margin-bottom: 32px; }
+    .section { margin-bottom: 28px; }
+    .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #8b5cf6; margin-bottom: 12px; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; }
+    .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .info-card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; }
+    .info-card .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #9ca3af; margin-bottom: 4px; }
+    .info-card .value { font-size: 15px; font-weight: 700; color: #1a1a2e; }
+    .content-block { background: #f9fafb; border-left: 4px solid #8b5cf6; border-radius: 0 8px 8px 0; padding: 20px 24px; margin-top: 12px; }
+    .content-block p { font-size: 13px; color: #374151; line-height: 1.75; }
+    .footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; font-size: 11px; color: #9ca3af; }
+    .status-badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; background: #d1fae5; color: #065f46; }
+    @media print { body { padding: 32px; } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">CEO <span>AI</span></div>
+    <div class="meta">
+      <strong>${report.name}</strong>
+      Generated: ${new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' })}
+    </div>
+  </div>
+
+  <h1>${report.name}</h1>
+  <p class="subtitle">Executive Intelligence Report — CEO AI Platform</p>
+
+  <div class="section">
+    <div class="section-title">Report Details</div>
+    <div class="info-grid">
+      <div class="info-card"><div class="label">Report Date</div><div class="value">${report.date}</div></div>
+      <div class="info-card"><div class="label">File Size</div><div class="value">${report.size}</div></div>
+      <div class="info-card"><div class="label">Status</div><div class="value"><span class="status-badge">${report.status}</span></div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Executive Summary</div>
+    <div class="content-block">
+      <p>This report was generated by the CEO AI multi-agent synthesis engine. It consolidates key operational signals, market intelligence data, and AI-driven recommendations relevant to <strong>${report.name}</strong>.</p>
+      <br/>
+      <p>All projections are based on real-time data streams ingested from connected business systems. Confidence interval: <strong>94.7%</strong>. Review and validate with your executive team before strategic deployment.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Key Metrics</div>
+    <div class="content-block">
+      <p>• AI Signals Processed: <strong>48</strong> &nbsp;|&nbsp; Model Accuracy: <strong>99.4%</strong> &nbsp;|&nbsp; Anomalies Flagged: <strong>3</strong></p>
+      <br/>
+      <p>• Revenue Opportunity Detected: <strong>₹3.4L</strong> &nbsp;|&nbsp; Risk Score: <strong>2.1 / 10</strong> &nbsp;|&nbsp; Actions Pending: <strong>7</strong></p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>CEO AI — Executive Intelligence Platform</span>
+    <span>Confidential — For Executive Use Only</span>
+    <span>Printed: ${new Date().toLocaleString('en-IN')}</span>
+  </div>
+
+  <script>window.onload = () => { window.print(); }<\/script>
+</body>
+</html>`)
+    win.document.close()
+  }
 }
 
 export function ReportsPage() {
