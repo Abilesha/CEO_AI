@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import api from '@services/api'
 import './engine-forms.css'
 import './Marketing.css'
 
@@ -256,7 +257,7 @@ export function MarketingPage() {
   }
 
   // ── Chat handlers ──
-  const handleChatSend = (e: React.FormEvent) => {
+  const handleChatSend = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!chatInput.trim() || isGenerating) return
     const userMsg: ChatMessage = { id: Date.now().toString(), role: 'user', text: chatInput, timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) }
@@ -265,8 +266,32 @@ export function MarketingPage() {
     setChatInput('')
     setIsGenerating(true)
 
-    // Simulate AI "thinking" delay
-    setTimeout(() => {
+    try {
+      const response = await api.post<GeneratedPost>('/marketing/generate-post', {
+        prompt: prompt,
+      })
+      if (response.data) {
+        const generated = response.data
+        const aiMsg: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          role: 'ai',
+          text: `Here's your Instagram post for **"${generated.theme}"** — tap **Use This Post** to send it to the approval queue! ✨`,
+          post: generated,
+          timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+        }
+        setChatMessages(prev => [...prev, aiMsg])
+      } else {
+        const generated = generatePostFromPrompt(prompt)
+        const aiMsg: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          role: 'ai',
+          text: `Here's your Instagram post for **"${generated.theme}"** — tap **Use This Post** to send it to the approval queue! ✨`,
+          post: generated,
+          timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+        }
+        setChatMessages(prev => [...prev, aiMsg])
+      }
+    } catch (err) {
       const generated = generatePostFromPrompt(prompt)
       const aiMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
@@ -276,8 +301,9 @@ export function MarketingPage() {
         timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
       }
       setChatMessages(prev => [...prev, aiMsg])
+    } finally {
       setIsGenerating(false)
-    }, 1500 + Math.random() * 800)
+    }
   }
 
   const handleUsePost = (post: GeneratedPost) => {

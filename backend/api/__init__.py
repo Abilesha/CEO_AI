@@ -19,6 +19,7 @@ from api.decisions import router as decisions_router
 from api.team import router as team_router
 from api.schedule import router as schedule_router
 from api.crisis import router as crisis_router
+from api.marketing import router as marketing_router
 
 api_router = APIRouter()
 
@@ -37,3 +38,4 @@ api_router.include_router(decisions_router,        prefix="/decisions",       ta
 api_router.include_router(team_router,             prefix="/team",            tags=["Team roster"])
 api_router.include_router(schedule_router,         prefix="/schedule",        tags=["Scheduler routines"])
 api_router.include_router(crisis_router,           prefix="/crisis",          tags=["Crisis risk detector"])
+api_router.include_router(marketing_router,        prefix="/marketing",       tags=["Marketing Engine"])

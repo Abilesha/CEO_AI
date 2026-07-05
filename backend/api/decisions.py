@@ -42,7 +42,7 @@ async def get_decisions():
 
     if db:
         try:
-            rows = await db.fetch_all("SELECT * FROM recommendations LIMIT 10")
+            rows = await db.fetch_all("SELECT * FROM recommendations ORDER BY created_at DESC, id DESC LIMIT 10")
             for r in rows:
                 row_dict = dict(r)
                 priority = str(row_dict.get("priority", "medium")).lower()
@@ -50,7 +50,7 @@ async def get_decisions():
                 results.append(DecisionItem(
                     id=str(row_dict.get("id", "")),
                     title=row_dict.get("title", "Strategic Recommendation"),
-                    description=row_dict.get("description") or f"Execute priority action: {row_dict.get('category', 'General')}",
+                    description=row_dict.get("summary") or row_dict.get("action") or f"Execute priority action: {row_dict.get('category', 'General')}",
                     impact=impact,
                     status=row_dict.get("status") or "pending",
                     created_at="2026-07-04"
@@ -88,7 +88,7 @@ async def update_decision_status(decision_id: str, body: UpdateDecisionRequest):
                 return DecisionItem(
                     id=str(row_dict["id"]),
                     title=row_dict.get("title", ""),
-                    description=row_dict.get("description") or "",
+                    description=row_dict.get("summary") or row_dict.get("action") or "",
                     impact=impact,
                     status=row_dict.get("status", "pending"),
                     created_at="2026-07-04"

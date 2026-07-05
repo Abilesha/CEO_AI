@@ -154,20 +154,25 @@ export function BoardroomPage() {
 
           {/* Transcript Feed */}
           <div className="debate-transcript-feed">
-            {debateHistory.map((turn, i) => (
-              <div key={i} className="debate-turn-card glass" style={{ borderLeftColor: turn.color }}>
-                <div className="turn-header">
-                  <span className="turn-avatar" style={{ background: `${turn.color}15`, color: turn.color }}>
-                    {turn.avatar}
-                  </span>
-                  <div className="turn-identity">
-                    <span className="turn-name">{turn.name}</span>
-                    <span className="turn-role" style={{ color: turn.color }}>{turn.role}</span>
+            {debateHistory.map((turn, i) => {
+              if (!turn) return null;
+              const color = turn.color || '#8b5cf6';
+              const avatar = turn.avatar || '🤖';
+              return (
+                <div key={i} className="debate-turn-card glass" style={{ borderLeftColor: color }}>
+                  <div className="turn-header">
+                    <span className="turn-avatar" style={{ background: `${color}15`, color: color }}>
+                      {avatar}
+                    </span>
+                    <div className="turn-identity">
+                      <span className="turn-name">{turn.name}</span>
+                      <span className="turn-role" style={{ color: color }}>{turn.role}</span>
+                    </div>
                   </div>
+                  <p className="turn-text">{turn.text}</p>
                 </div>
-                <p className="turn-text">{turn.text}</p>
-              </div>
-            ))}
+              );
+            })}
 
             {isDebating && (
               <div className="debate-turn-card typing-placeholder glass">
