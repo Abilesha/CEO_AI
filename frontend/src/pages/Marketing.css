@@ -1,95 +1,578 @@
-.marketing-page {
+/* Marketing.css — Campaign Engine + Instagram Auto-Post */
+
+/* ── Tab Switcher ── */
+.mkt-tabs {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding-bottom: 0.75rem;
 }
 
-.marketing-header {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
+.mkt-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 1.1rem;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: rgba(148,163,184,0.7);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+.mkt-tab:hover { color: #f1f5f9; background: rgba(255,255,255,0.04); }
+.mkt-tab.active {
+  color: #f472b6;
+  background: rgba(236,72,153,0.1);
+  border-color: rgba(236,72,153,0.25);
 }
 
-.marketing-title {
-  font-size: var(--text-2xl);
-  font-weight: var(--weight-bold);
-  color: var(--color-text-primary);
+.mkt-tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  background: #ec4899;
+  color: #fff;
+  border-radius: 50%;
+  margin-left: 2px;
 }
 
-.marketing-subtitle {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-}
+.insta-tab-icon { font-size: 0.95rem; }
 
-.marketing-grid {
+/* ── Instagram Layout ── */
+.insta-layout {
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: var(--space-6);
+  grid-template-columns: 340px 1fr;
+  gap: 1.5rem;
+  align-items: start;
 }
 
-@media (max-width: 900px) {
-  .marketing-grid {
-    grid-template-columns: 1fr;
-  }
+@media (max-width: 1050px) {
+  .insta-layout { grid-template-columns: 1fr; }
 }
 
-.marketing-form-panel, .marketing-output-panel {
-  padding: var(--space-6);
+/* ── LEFT: Schedule Card ── */
+.insta-left { display: flex; flex-direction: column; gap: 1.25rem; }
+
+.insta-schedule-card {
+  padding: 1.4rem;
+  border-radius: 16px;
+  border: 1px solid rgba(236,72,153,0.15);
+}
+
+.insta-schedule-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.insta-schedule-icon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.insta-schedule-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 2px;
+}
+
+.insta-schedule-sub {
+  font-size: 0.72rem;
+  color: rgba(148,163,184,0.55);
+}
+
+/* Toggle Switch */
+.insta-toggle {
+  margin-left: auto;
+  width: 44px;
+  height: 24px;
+  border-radius: 99px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  flex-shrink: 0;
+}
+.insta-toggle.on  { background: linear-gradient(135deg, #ec4899, #be185d); box-shadow: 0 0 10px rgba(236,72,153,0.4); }
+.insta-toggle.off { background: rgba(255,255,255,0.1); }
+
+.insta-toggle-knob {
+  position: absolute;
+  top: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  transition: left 0.3s ease;
+}
+.insta-toggle.on  .insta-toggle-knob { left: 23px; }
+.insta-toggle.off .insta-toggle-knob { left: 3px;  }
+
+.insta-schedule-body {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
-  min-height: 400px;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255,255,255,0.05);
 }
 
-.marketing-form-panel h3, .marketing-output-panel h3 {
-  font-size: var(--text-base);
-  font-weight: var(--weight-semi);
-  color: var(--color-text-primary);
-  border-bottom: 1px solid var(--color-border);
-  padding-bottom: var(--space-3);
+.insta-sched-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
-.output-content {
+.insta-sched-row label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(148,163,184,0.7);
+  flex-shrink: 0;
+}
+
+.insta-sched-select, .insta-sched-input {
+  padding: 0.4rem 0.65rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 7px;
+  color: #f1f5f9;
+  font-size: 0.78rem;
+  font-family: inherit;
+  outline: none;
+  flex: 1;
+  max-width: 160px;
+}
+.insta-sched-select:focus, .insta-sched-input:focus { border-color: rgba(236,72,153,0.35); }
+.insta-sched-select option { background: #13131f; }
+
+.insta-next-post {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: 3px;
+  padding: 0.65rem 0.85rem;
+  background: rgba(236,72,153,0.06);
+  border: 1px solid rgba(236,72,153,0.15);
+  border-radius: 9px;
 }
 
-.output-row {
+.insta-next-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(244,114,182,0.7);
+}
+
+.insta-next-val {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+.insta-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #34d399;
+  background: rgba(16,185,129,0.08);
+  border: 1px solid rgba(16,185,129,0.2);
+  padding: 0.3rem 0.75rem;
+  border-radius: 99px;
+  align-self: flex-start;
+}
+
+.insta-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 5px #10b981;
+  animation: livePulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.insta-disabled-notice {
+  font-size: 0.78rem;
+  color: rgba(148,163,184,0.5);
+  padding: 0.75rem 0;
+  font-style: italic;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+/* ── Post History ── */
+.insta-history-card {
+  padding: 1.25rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.insta-history-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin-bottom: 0.85rem;
+}
+
+.insta-history-list { display: flex; flex-direction: column; gap: 0.6rem; }
+
+.insta-hist-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.75rem;
+  border-radius: 9px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.insta-hist-meta { display: flex; flex-direction: column; gap: 2px; }
+
+.insta-hist-theme {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(203,213,225,0.9);
+}
+
+.insta-hist-date {
+  font-size: 0.65rem;
+  color: rgba(148,163,184,0.45);
+}
+
+.insta-hist-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.insta-hist-badge.posted  { background: rgba(16,185,129,0.1);  color: #34d399; border: 1px solid rgba(16,185,129,0.2); }
+.insta-hist-badge.pending { background: rgba(251,191,36,0.1);  color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
+.insta-hist-badge.skipped { background: rgba(239,68,68,0.08);  color: #f87171; border: 1px solid rgba(239,68,68,0.15); }
+
+.insta-hist-empty {
+  font-size: 0.78rem;
+  color: rgba(148,163,184,0.4);
+  font-style: italic;
+  text-align: center;
+  padding: 0.75rem;
+}
+
+/* ── RIGHT: Approval Card ── */
+.insta-right { display: flex; flex-direction: column; gap: 1.25rem; }
+
+.insta-approval-card {
+  padding: 1.5rem;
+  border-radius: 18px;
+  border: 1px solid rgba(236,72,153,0.2);
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 1.25rem;
 }
 
-.output-row strong {
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
+.insta-approval-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.insta-approval-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #f472b6;
+  background: rgba(236,72,153,0.1);
+  border: 1px solid rgba(236,72,153,0.25);
+  padding: 0.25rem 0.7rem;
+  border-radius: 99px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
-.output-row p {
-  font-size: var(--text-sm);
-  color: var(--color-text-primary);
-  line-height: 1.6;
+.insta-approval-theme {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(148,163,184,0.7);
 }
 
-.loading-state {
+/* ── Phone Mockup ── */
+.insta-phone-mockup {
+  background: #1a1a2e;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  max-width: 340px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.insta-mock-header {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.insta-mock-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ec4899, #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #fff;
+  border: 2px solid rgba(236,72,153,0.5);
+  flex-shrink: 0;
+}
+
+.insta-mock-name {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+}
+
+.insta-mock-name span:first-child { font-size: 0.8rem; font-weight: 700; color: #f1f5f9; }
+.insta-mock-sub { font-size: 0.65rem; color: rgba(148,163,184,0.5); }
+.insta-mock-dots { font-size: 1rem; color: rgba(148,163,184,0.5); margin-left: auto; letter-spacing: 1px; }
+
+.insta-mock-image {
+  height: 200px;
+  background: linear-gradient(135deg, #1a0533 0%, #0d1f3c 40%, #0a2a1a 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex-grow: 1;
-  gap: var(--space-3);
+  gap: 0.5rem;
+  position: relative;
 }
 
-.spinner {
-  font-size: 2rem;
-  animation: spin 2s linear infinite;
-  color: var(--color-primary-light);
+.insta-mock-emoji { font-size: 3.5rem; }
+.insta-mock-label {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #ec4899, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.08em;
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.insta-mock-actions {
+  display: flex;
+  gap: 1rem;
+  padding: 0.6rem 1rem;
+  font-size: 1.1rem;
+  border-top: 1px solid rgba(255,255,255,0.04);
 }
+
+.insta-mock-caption {
+  padding: 0.5rem 1rem 0.85rem;
+  font-size: 0.75rem;
+  color: rgba(203,213,225,0.85);
+  line-height: 1.5;
+}
+
+.insta-mock-more { color: rgba(148,163,184,0.5); }
+
+/* ── Caption Section ── */
+.insta-caption-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.insta-caption-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.insta-caption-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(148,163,184,0.6);
+}
+
+.insta-edit-btn {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #f472b6;
+  background: rgba(236,72,153,0.08);
+  border: 1px solid rgba(236,72,153,0.2);
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.insta-edit-btn:hover { background: rgba(236,72,153,0.15); }
+
+.insta-caption-text {
+  font-size: 0.8rem;
+  color: rgba(203,213,225,0.85);
+  line-height: 1.65;
+  white-space: pre-line;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 9px;
+  padding: 0.75rem 1rem;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.insta-caption-textarea,
+.insta-hashtag-textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(236,72,153,0.2);
+  border-radius: 9px;
+  color: #f1f5f9;
+  font-size: 0.8rem;
+  font-family: inherit;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.insta-caption-textarea:focus,
+.insta-hashtag-textarea:focus { border-color: rgba(236,72,153,0.4); }
+
+.insta-hashtag-section { display: flex; flex-direction: column; gap: 0.4rem; }
+
+.insta-cta-text { display: flex; flex-direction: column; gap: 0.35rem; }
+.insta-cta-value {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(244,114,182,0.85);
+  font-style: italic;
+}
+
+/* ── Approval Action Buttons ── */
+.insta-approval-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 2fr;
+  gap: 0.6rem;
+}
+
+@media (max-width: 700px) {
+  .insta-approval-actions { grid-template-columns: repeat(2, 1fr); }
+}
+
+.insta-btn-regen, .insta-btn-copy, .insta-btn-skip, .insta-btn-approve {
+  padding: 0.6rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-family: inherit;
+}
+
+.insta-btn-regen {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(203,213,225,0.85);
+}
+.insta-btn-regen:hover:not(:disabled) { background: rgba(255,255,255,0.08); color: #f1f5f9; }
+.insta-btn-regen:disabled { opacity: 0.5; cursor: default; }
+
+.insta-btn-copy {
+  background: rgba(6,182,212,0.08);
+  border: 1px solid rgba(6,182,212,0.25);
+  color: #22d3ee;
+}
+.insta-btn-copy:hover { background: rgba(6,182,212,0.16); }
+
+.insta-btn-skip {
+  background: rgba(239,68,68,0.06);
+  border: 1px solid rgba(239,68,68,0.15);
+  color: #f87171;
+}
+.insta-btn-skip:hover { background: rgba(239,68,68,0.12); }
+
+.insta-btn-approve {
+  background: linear-gradient(135deg, #ec4899, #be185d);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(236,72,153,0.3);
+}
+.insta-btn-approve:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(236,72,153,0.4); }
+
+/* ── Success Card ── */
+.insta-success-card {
+  padding: 2rem 1.75rem;
+  border-radius: 18px;
+  border: 1px solid rgba(16,185,129,0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.75rem;
+}
+
+.insta-success-icon { font-size: 3rem; }
+
+.insta-success-card h3 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.insta-success-card p {
+  font-size: 0.83rem;
+  color: rgba(148,163,184,0.8);
+  line-height: 1.5;
+}
+
+.insta-success-sub {
+  font-size: 0.75rem;
+  color: rgba(148,163,184,0.5);
+}
+
+.insta-success-detail {
+  width: 100%;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.insta-success-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+}
+
+.insta-success-row span { color: rgba(148,163,184,0.6); }
+.insta-success-row strong { color: #34d399; font-weight: 700; }
