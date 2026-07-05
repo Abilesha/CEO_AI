@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import api from '@services/api'
 import './engine-forms.css'
 import './Boardroom.css'
 
@@ -10,61 +11,60 @@ interface DebateTurn {
   color: string
 }
 
+interface ConsensusDetails {
+  title: string
+  steps: string[]
+  expected_impact: string
+  confidence_score: string
+}
+
 export function BoardroomPage() {
   const [query, setQuery] = useState('How can I increase revenue next quarter?')
   const [isDebating, setIsDebating] = useState(false)
   const [debateStep, setDebateStep] = useState(0)
   const [debateHistory, setDebateHistory] = useState<DebateTurn[]>([])
+  const [consensus, setConsensus] = useState<ConsensusDetails | null>(null)
+  const [errorMsg, setErrorMsg] = useState('')
 
-  const debateTimeline: DebateTurn[] = [
-    {
-      role: 'Marketing Agent',
-      name: 'Ananya (Marketing Exec)',
-      avatar: '📢',
-      text: 'We should increase our Instagram and Meta ad spend by 20%. Indian festivals are approaching, and acquiring high top-of-funnel traffic now is vital.',
-      color: '#ec4899',
-    },
-    {
-      role: 'Finance Agent',
-      name: 'Vikram (Chief Financial Officer)',
-      avatar: '💸',
-      text: 'Ad spend is already at an all-time high, accounting for 38% of our operating expenses. We cannot risk customer acquisition costs scaling faster than lifetime value. Budget must be constrained.',
-      color: '#f59e0b',
-    },
-    {
-      role: 'Sales Agent',
-      name: 'Rahul (Sales Director)',
-      avatar: '💰',
-      text: 'Raw lead quantity is not our bottleneck — lead conversion quality is. Instead of burning budget on ads, we should introduce high-intent bundle offers to increase average order value (AOV).',
-      color: '#10b981',
-    },
-    {
-      role: 'Customer Success Agent',
-      name: 'Priyanka (CS Lead)',
-      avatar: '🤝',
-      text: 'Acquiring new clients in India currently costs 5x more than retaining existing ones. We can generate immediate expansion revenue by launching a customer loyalty and upgrade campaign.',
-      color: '#fb923c',
-    },
-  ]
-
-  const handleStartDebate = () => {
+  const handleStartDebate = async () => {
+    if (!query.trim()) return
     setIsDebating(true)
     setDebateStep(0)
     setDebateHistory([])
+    setConsensus(null)
+    setErrorMsg('')
 
-    // Trigger step-by-step debate turns simulation
-    let currentStep = 0
-    const interval = setInterval(() => {
-      if (currentStep < debateTimeline.length) {
-        setDebateHistory(prev => [...prev, debateTimeline[currentStep]])
-        setDebateStep(currentStep + 1)
-        currentStep++
+    try {
+      const response = await api.post<{ turns: DebateTurn[]; consensus: ConsensusDetails }>('/boardroom', {
+        query,
+      })
+
+      if (response.data) {
+        const fetchedTurns = response.data.turns
+        const fetchedConsensus = response.data.consensus
+
+        // Animate the turns step-by-step
+        let currentStep = 0
+        const interval = setInterval(() => {
+          if (fetchedTurns && currentStep < fetchedTurns.length) {
+            setDebateHistory(prev => [...prev, fetchedTurns[currentStep]])
+            setDebateStep(currentStep + 1)
+            currentStep++
+          } else {
+            clearInterval(interval)
+            setIsDebating(false)
+            setConsensus(fetchedConsensus)
+            setDebateStep(5) // Debate complete
+          }
+        }, 1800)
       } else {
-        clearInterval(interval)
+        setErrorMsg(response.error || 'Failed to convene boardroom debate.')
         setIsDebating(false)
-        setDebateStep(5) // Debate complete
       }
-    }, 1800)
+    } catch (err) {
+      setErrorMsg('Network error connecting to the Boardroom agent.')
+      setIsDebating(false)
+    }
   }
 
   return (
@@ -89,6 +89,12 @@ export function BoardroomPage() {
           A Virtual Executive Team that debates and resolves conflicting priorities before presenting the final business decision.
         </p>
       </div>
+
+      {errorMsg && (
+        <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.25)', padding: '0.75rem', borderRadius: '8px', color: '#f87171', fontSize: '0.85rem', marginBottom: '1rem' }}>
+          ⚠️ {errorMsg}
+        </div>
+      )}
 
       <div className="boardroom-layout">
         {/* Left Column: Query Console */}
@@ -172,7 +178,7 @@ export function BoardroomPage() {
             )}
 
             {/* Resolved Strategy decision card */}
-            {debateStep === 5 && (
+            {debateStep === 5 && consensus && (
               <div className="boardroom-consensus-section animate-slide-up">
                 <div className="strategy-resolution-header">
                   <span className="resolution-icon">⚙️</span>
@@ -183,21 +189,21 @@ export function BoardroomPage() {
                 </div>
 
                 <div className="resolution-body glass">
-                  <h4 className="resolution-title">📋 Revenue Growth Plan</h4>
+                  <h4 className="resolution-title">📋 {consensus.title}</h4>
                   <ol className="resolution-steps">
-                    <li><strong>Launch bundle offer</strong>: Address conversion blockers by packaging high-margin add-ons with standard subscriptions.</li>
-                    <li><strong>Run retargeting campaign</strong>: Focus marketing on high-intent cart abandoners to boost ROI.</li>
-                    <li><strong>Cap ad spend increase at 10%</strong>: Maintain capital efficiency under Finance constraints.</li>
+                    {consensus.steps.map((step, idx) => (
+                      <li key={idx}>{step}</li>
+                    ))}
                   </ol>
 
                   <div className="resolution-impact-row">
                     <div className="impact-badge positive">
                       <span className="impact-badge-lbl">Expected Impact</span>
-                      <span className="impact-badge-val">Revenue +14%</span>
+                      <span className="impact-badge-val">{consensus.expected_impact}</span>
                     </div>
                     <div className="impact-badge info">
                       <span className="impact-badge-lbl">Confidence Score</span>
-                      <span className="impact-badge-val">87%</span>
+                      <span className="impact-badge-val">{consensus.confidence_score}</span>
                     </div>
                   </div>
                 </div>

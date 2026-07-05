@@ -13,6 +13,12 @@ from api.recommendations import router as recommendations_router
 from api.onboarding import router as onboarding_router
 from api.leadgen import router as leadgen_router
 from api.sales import router as sales_router
+from api.boardroom import router as boardroom_router
+from api.reports import router as reports_router
+from api.decisions import router as decisions_router
+from api.team import router as team_router
+from api.schedule import router as schedule_router
+from api.crisis import router as crisis_router
 
 api_router = APIRouter()
 
@@ -25,3 +31,9 @@ api_router.include_router(recommendations_router,  prefix="/recommendations", ta
 api_router.include_router(onboarding_router,       prefix="/onboarding",      tags=["Onboarding"])
 api_router.include_router(leadgen_router,          prefix="/leadgen",         tags=["Lead Generation"])
 api_router.include_router(sales_router,            prefix="/sales",           tags=["Sales Funnels"])
+api_router.include_router(boardroom_router,        prefix="/boardroom",       tags=["Boardroom Debate"])
+api_router.include_router(reports_router,          prefix="/reports",         tags=["Reports Archive"])
+api_router.include_router(decisions_router,        prefix="/decisions",       tags=["Decisions approval"])
+api_router.include_router(team_router,             prefix="/team",            tags=["Team roster"])
+api_router.include_router(schedule_router,         prefix="/schedule",        tags=["Scheduler routines"])
+api_router.include_router(crisis_router,           prefix="/crisis",          tags=["Crisis risk detector"])

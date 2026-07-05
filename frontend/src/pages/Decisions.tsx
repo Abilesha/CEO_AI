@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import api from '@services/api'
 import './Decisions.css'
 
 interface DecisionItem {
@@ -10,48 +11,42 @@ interface DecisionItem {
   created_at: string
 }
 
-const INITIAL_DECISONS: DecisionItem[] = [
-  {
-    id: 'dec-1',
-    title: 'Diversify Component Assembly to APAC-B',
-    description: 'Move 35% of parts staging to Vietnam base to bypass upcoming regional tariff adjustments.',
-    impact: 'high',
-    status: 'pending',
-    created_at: '2026-07-04',
-  },
-  {
-    id: 'dec-2',
-    title: 'Deprecate API Legacy Cluster V1',
-    description: 'Sunset the REST pipeline build v1.4.1. Estimated token savings: 18%.',
-    impact: 'medium',
-    status: 'pending',
-    created_at: '2026-07-04',
-  },
-  {
-    id: 'dec-3',
-    title: 'Approve Cloud Infrastructure Expansion',
-    description: 'Provision an additional multi-region cluster for database replication.',
-    impact: 'high',
-    status: 'approved',
-    created_at: '2026-07-02',
-  },
-  {
-    id: 'dec-4',
-    title: 'Ad-hoc Social Campaign Launch',
-    description: 'Deploy auto-generated AI advertising campaign across digital media.',
-    impact: 'low',
-    status: 'rejected',
-    created_at: '2026-06-30',
-  },
-]
-
 export function DecisionsPage() {
-  const [decisions, setDecisions] = useState<DecisionItem[]>(INITIAL_DECISONS)
+  const [decisions, setDecisions] = useState<DecisionItem[]>([])
+  const [errorMsg, setErrorMsg] = useState('')
 
-  const updateStatus = (id: string, newStatus: 'approved' | 'rejected') => {
-    setDecisions((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, status: newStatus } : item))
-    )
+  const fetchDecisions = async () => {
+    try {
+      const response = await api.get<DecisionItem[]>('/decisions')
+      if (response.data) {
+        setDecisions(response.data)
+      }
+    } catch (err) {
+      console.error('Failed to fetch decisions', err)
+    }
+  }
+
+  useEffect(() => {
+    fetchDecisions()
+  }, [])
+
+  const updateStatus = async (id: string, newStatus: 'approved' | 'rejected') => {
+    setErrorMsg('')
+    try {
+      const response = await api.patch<DecisionItem>(`/decisions/${id}`, {
+        status: newStatus,
+      })
+
+      if (response.data) {
+        setDecisions((prev) =>
+          prev.map((item) => (item.id === id ? { ...item, status: newStatus } : item))
+        )
+      } else {
+        setErrorMsg(response.error || 'Failed to update decision.')
+      }
+    } catch (err) {
+      setErrorMsg('Network error updating decision status.')
+    }
   }
 
   const columns = [
@@ -62,6 +57,12 @@ export function DecisionsPage() {
 
   return (
     <div className="decisions animate-fade-in">
+      {errorMsg && (
+        <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.25)', padding: '0.75rem', borderRadius: '8px', color: '#f87171', fontSize: '0.85rem', marginBottom: '1rem', width: '100%' }}>
+          ⚠️ {errorMsg}
+        </div>
+      )}
+
       <div className="decisions-columns">
         {columns.map((col) => {
           const colItems = decisions.filter((d) => d.status === col.id)

@@ -25,7 +25,8 @@ async def connect_db():
             logger.warning("DATABASE_URL not configured — skipping DB connection.")
             return
 
-        _db = Database(settings.DATABASE_URL)
+        # Limit pool sizes to prevent running out of session pooler slots
+        _db = Database(settings.DATABASE_URL, min_size=1, max_size=3)
         await _db.connect()
         logger.info("✅ Connected to PostgreSQL (Supabase)")
     except Exception as exc:

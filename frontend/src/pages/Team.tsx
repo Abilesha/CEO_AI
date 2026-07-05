@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import api from '@services/api'
 import './Team.css'
 
 interface TeamMember {
@@ -10,39 +11,61 @@ interface TeamMember {
   avatarUrl?: string
 }
 
-const INITIAL_MEMBERS: TeamMember[] = [
-  { id: '1', name: 'Subhasri executive', email: 'subhasri@ceo.ai', role: 'admin', status: 'active' },
-  { id: '2', name: 'Alexander Sterling', email: 'alex@ceo.ai', role: 'executive', status: 'active' },
-  { id: '3', name: 'Sarah Vance', email: 'sarah@ceo.ai', role: 'executive', status: 'offline' },
-  { id: '4', name: 'Michael Coyle', email: 'michael@ceo.ai', role: 'viewer', status: 'offline' },
-]
-
 export function TeamPage() {
-  const [members, setMembers] = useState<TeamMember[]>(INITIAL_MEMBERS)
+  const [members, setMembers] = useState<TeamMember[]>([])
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteRole, setInviteRole] = useState<'admin' | 'executive' | 'viewer'>('viewer')
   const [inviteName, setInviteName] = useState('')
+  const [errorMsg, setErrorMsg] = useState('')
 
-  const handleInvite = (e: React.FormEvent) => {
+  const fetchTeam = async () => {
+    try {
+      const response = await api.get<TeamMember[]>('/team')
+      if (response.data) {
+        setMembers(response.data)
+      }
+    } catch (err) {
+      console.error('Failed to load team roster', err)
+    }
+  }
+
+  useEffect(() => {
+    fetchTeam()
+  }, [])
+
+  const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!inviteEmail.trim() || !inviteName.trim()) return
+    setErrorMsg('')
 
-    const newMember: TeamMember = {
-      id: (members.length + 1).toString(),
-      name: inviteName,
-      email: inviteEmail,
-      role: inviteRole,
-      status: 'offline',
+    try {
+      const response = await api.post<TeamMember>('/team', {
+        name: inviteName,
+        email: inviteEmail,
+        role: inviteRole,
+      })
+
+      if (response.data) {
+        setMembers((prev) => [...prev, response.data!])
+        setInviteName('')
+        setInviteEmail('')
+        setInviteRole('viewer')
+      } else {
+        setErrorMsg(response.error || 'Failed to send roster invite.')
+      }
+    } catch (err) {
+      setErrorMsg('Network error sending invite.')
     }
-
-    setMembers((prev) => [...prev, newMember])
-    setInviteName('')
-    setInviteEmail('')
-    setInviteRole('viewer')
   }
 
   return (
     <div className="team animate-fade-in">
+      {errorMsg && (
+        <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.25)', padding: '0.75rem', borderRadius: '8px', color: '#f87171', fontSize: '0.85rem', marginBottom: '1rem', width: '100%' }}>
+          ⚠️ {errorMsg}
+        </div>
+      )}
+
       <div className="team-layout">
         {/* Members Grid */}
         <div className="team-list">
@@ -52,7 +75,7 @@ export function TeamPage() {
               <div key={member.id} className="member-card glass" id={`member-${member.id}`}>
                 <div className="member-card__header">
                   <div className="member-avatar">
-                    {member.name[0]}
+                    {member.name[0]?.toUpperCase()}
                     <span className={`status-indicator ${member.status}`}></span>
                   </div>
                   <div className="member-meta">

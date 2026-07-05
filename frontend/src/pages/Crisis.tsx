@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import api from '@services/api'
 import './engine-forms.css'
 import './Crisis.css'
 
@@ -17,71 +18,31 @@ interface RiskCategory {
 
 export function CrisisPage() {
   const [selectedRisk, setSelectedRisk] = useState<string>('lead')
+  const [riskCategories, setRiskCategories] = useState<RiskCategory[]>([])
+  const [isAuditing, setIsAuditing] = useState(false)
 
-  const riskCategories: RiskCategory[] = [
-    {
-      id: 'lead',
-      name: 'Lead Pipeline Risk',
-      level: 'High',
-      indicatorColor: '#f87171',
-      badgeClass: 'danger',
-      briefSummary: 'Lead generation decreased by 18% over the past 14 days.',
-      metrics: ['Website Traffic: -8%', 'Ad Click-through Rate: -14%', 'Form Submissions: -18%'],
-      reason: 'Ad fatigue detected on Meta and Google display networks. The current creative assets have been running for 90+ days without updates.',
-      actions: [
-        'Launch WhatsApp Campaign: Re-engage top-of-funnel drops using custom template hooks.',
-        'Run Retargeting Ads: Refresh ad copy focusing on compliance features.',
-        'Reactivate Cold Leads: Set up an automated email discount sweep targeting leads cold for 30+ days.',
-      ],
-      recovery: '+11% Lead Growth (Expected recovery period: 10 days)',
-    },
-    {
-      id: 'churn',
-      name: 'Customer Churn Risk',
-      level: 'Medium',
-      indicatorColor: '#fbbf24',
-      badgeClass: 'warning',
-      briefSummary: 'Projected loss of 37 customers due to support escalations.',
-      metrics: ['Support Tickets Volume: +22%', 'Negative Feedback Reviews: +5%', 'Product Usage Velocity: -4%'],
-      reason: 'Onboarding bottleneck. New clients are getting stuck in the Supabase/API integration phase, causing ticket volume spikes.',
-      actions: [
-        'Publish Integration Guide: Email a step-by-step walkthrough detailing webhook configurations.',
-        'Trigger CS Callback: Have account managers reach out to clients with tickets open for 48+ hours.',
-        'Deploy Chatbot Assist: Pre-populate the Customer Success bot with API credentials guide chips.',
-      ],
-      recovery: '-28% Churn Reduction (Preventing loss of ~15 accounts)',
-    },
-    {
-      id: 'revenue',
-      name: 'Revenue Risk',
-      level: 'Low',
-      indicatorColor: '#34d399',
-      badgeClass: 'success',
-      briefSummary: 'Quarterly MRR growth is stable with minor regional variance.',
-      metrics: ['Indian Segment ARR: +18%', 'APAC Segment ARR: +4%', 'AOV Expansion: +3%'],
-      reason: 'No critical revenue leaks detected. Upsell streams in Bangalore tech corridor are offsetting minor pipeline slippages.',
-      actions: [
-        'Monitor Regional Volatility: Run weekly audits on APAC contract renewals.',
-        'Expand AOV Bundles: Launch B2B value packs for SaaS accounts.',
-      ],
-      recovery: 'Maintain stable ARR trajectory (+14% QoQ target)',
-    },
-    {
-      id: 'cashflow',
-      name: 'Cash Flow Risk',
-      level: 'Low',
-      indicatorColor: '#34d399',
-      badgeClass: 'success',
-      briefSummary: 'Receivables collections are healthy; runway is comfortable.',
-      metrics: ['Receivables Dues: 94% on time', 'Average Collections Period: 18 days', 'Remaining Runway: 4.2 Months'],
-      reason: 'Working capital cycles are optimal. Outflows are balanced against recurring subscription cycles.',
-      actions: [
-        'Audit Runway Burn: Update forecast modeling values in Analytics Engine.',
-        'Setup Early Invoicing: Automate invoice dispatches 5 days before payment cycles.',
-      ],
-      recovery: 'Extend runway to 5.5 Months',
-    },
-  ]
+  const fetchRisks = async () => {
+    setIsAuditing(true)
+    try {
+      const response = await api.get<RiskCategory[]>('/crisis')
+      if (response.data && response.data.length > 0) {
+        setRiskCategories(response.data)
+        // Ensure selected risk exists in returned data, otherwise default to first
+        const hasRisk = response.data.some(r => r.id === selectedRisk)
+        if (!hasRisk) {
+          setSelectedRisk(response.data[0].id)
+        }
+      }
+    } catch (err) {
+      console.error('Failed to run risk audit', err)
+    } finally {
+      setIsAuditing(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchRisks()
+  }, [])
 
   const activeRisk = riskCategories.find(r => r.id === selectedRisk) || riskCategories[0]
 
@@ -104,117 +65,112 @@ export function CrisisPage() {
       <div className="engine-page-header">
         <h2 className="engine-page-title">🛡️ AI Crisis Detector</h2>
         <p className="engine-page-subtitle">
-          "Predict problems before they happen." Continuous automated auditing across marketing, sales, cash flow, and churn metrics.
+          Real-time risk audit engines that scan database health, customer support backlogs, and pipeline drops.
         </p>
       </div>
 
-      {/* Health Score Overview Panel */}
-      <div className="crisis-hero-score glass">
-        <div className="radial-score-container">
-          <svg viewBox="0 0 100 100" className="radial-progress-svg">
-            <circle cx="50" cy="50" r="42" className="radial-bg" />
-            <circle
-              cx="50"
-              cy="50"
-              r="42"
-              className="radial-fill animate-draw-circle"
-              style={{ strokeDashoffset: `${264 - (264 * 84) / 100}` }}
-            />
-          </svg>
-          <div className="score-inner-text">
-            <span className="score-num">84</span>
-            <span className="score-max">/100</span>
-          </div>
-        </div>
-        <div className="score-analysis">
-          <h3>Overall Business Health Status</h3>
-          <p>
-            Your organization score stands at <strong>84/100 (Strong)</strong>. The system has flagged
-            <strong> 1 High Risk</strong> and <strong>1 Medium Risk</strong> across current workflows. Cash flow metrics and Revenue stability remain healthy.
-          </p>
-          <div className="critical-notice-badge">
-            🚨 Immediate attention recommended for the Lead Generation pipeline.
-          </div>
-        </div>
-      </div>
+      <div className="crisis-layout">
 
-      <div className="crisis-layout-grid">
-        {/* Left Column: Risk Cards */}
-        <div className="risks-panel-list">
-          {riskCategories.map(r => (
-            <div
-              key={r.id}
-              className={`risk-category-card glass ${selectedRisk === r.id ? 'active' : ''}`}
-              onClick={() => setSelectedRisk(r.id)}
-            >
-              <div className="risk-card-header">
-                <span className="risk-card-title">{r.name}</span>
-                <span className={`risk-card-badge ${r.badgeClass}`}>
-                  ● {r.level} Risk
+        {/* ---- Left Sidebar: Categories ---- */}
+        <div className="crisis-sidebar glass">
+          <div className="crisis-sidebar-header">
+            <h4>Risk Categories</h4>
+            <button className="btn btn-ghost btn-audit" onClick={fetchRisks} disabled={isAuditing}>
+              {isAuditing ? 'Auditing...' : '↺ Audit Risks'}
+            </button>
+          </div>
+          
+          <div className="risk-selector-list">
+            {riskCategories.map(risk => (
+              <button
+                key={risk.id}
+                onClick={() => setSelectedRisk(risk.id)}
+                className={`risk-selector-btn glass ${selectedRisk === risk.id ? 'active' : ''}`}
+              >
+                <div className="risk-selector-meta">
+                  <span className="risk-name">{risk.name}</span>
+                  <span className={`badge badge-${risk.badgeClass}`} style={{ fontSize: '9px' }}>
+                    {risk.level}
+                  </span>
+                </div>
+                <p className="risk-selector-summary">{risk.briefSummary}</p>
+                <div className="selection-indicator" style={{ background: risk.indicatorColor }} />
+              </button>
+            ))}
+
+            {riskCategories.length === 0 && (
+              <div className="crisis-empty" style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-secondary)' }}>
+                ◌ Running safety audit scan...
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ---- Right Panel: Risk Details ---- */}
+        <div className="crisis-content-panel">
+          {activeRisk ? (
+            <div className="risk-details-card glass animate-fade-in" key={activeRisk.id}>
+              {/* Header */}
+              <div className="risk-detail-header" style={{ borderLeftColor: activeRisk.indicatorColor }}>
+                <div>
+                  <h3 className="risk-detail-title">{activeRisk.name}</h3>
+                  <span className="risk-detail-subtitle">{activeRisk.briefSummary}</span>
+                </div>
+                <span className={`badge badge-${activeRisk.badgeClass} risk-level-badge`}>
+                  {activeRisk.level} Risk
                 </span>
               </div>
-              <p className="risk-card-summary">{r.briefSummary}</p>
-              <div className="risk-card-indicator" style={{ background: r.indicatorColor }} />
+
+              {/* Grid sections */}
+              <div className="risk-detail-grid">
+                
+                {/* Reason & Core Metrics */}
+                <div className="risk-detail-left">
+                  <div className="detail-section">
+                    <h5>⚠️ Core Trigger Metrics</h5>
+                    <ul className="metrics-list">
+                      {activeRisk.metrics.map((m, idx) => (
+                        <li key={idx} className="metric-item">{m}</li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="detail-section">
+                    <h5>🕵️ AI Root Cause Analysis</h5>
+                    <p className="reason-text">{activeRisk.reason}</p>
+                  </div>
+                </div>
+
+                {/* Automated Actions & Recovery */}
+                <div className="risk-detail-right">
+                  <div className="detail-section">
+                    <h5>🛠️ Recommended Playbooks &amp; Actions</h5>
+                    <div className="actions-checklist">
+                      {activeRisk.actions.map((act, idx) => (
+                        <div key={idx} className="action-checkbox-row">
+                          <input type="checkbox" defaultChecked className="action-checkbox" id={`act-${idx}`} />
+                          <label htmlFor={`act-${idx}`} className="action-checkbox-label">{act}</label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="detail-section recovery-section" style={{ background: `${activeRisk.indicatorColor}0d`, borderColor: `${activeRisk.indicatorColor}22` }}>
+                    <h5 style={{ color: activeRisk.indicatorColor }}>🎯 Target Recovery Milestone</h5>
+                    <p className="recovery-text">{activeRisk.recovery}</p>
+                  </div>
+                </div>
+
+              </div>
             </div>
-          ))}
+          ) : (
+            <div className="risk-details-placeholder glass">
+              <div className="placeholder-icon">🛡️</div>
+              <p>Select a risk category from the roster list to audit metrics and activate custom playbooks.</p>
+            </div>
+          )}
         </div>
 
-        {/* Right Column: AI Action Plan */}
-        <div className="engine-output-panel action-plan-panel">
-          <div className="engine-output-title">
-            🤖 AI Tactical Recovery Action Plan
-          </div>
-
-          <div className="action-plan-content">
-            <div className="plan-header-row">
-              <span className="plan-risk-name">{activeRisk.name}</span>
-              <span className={`risk-badge ${activeRisk.badgeClass}`}>
-                ● {activeRisk.level} Priority
-              </span>
-            </div>
-
-            {/* Risk indicators list */}
-            <div className="risk-indicators-box glass">
-              <h5>Detected Anomalous Signals:</h5>
-              <ul className="anomalous-list">
-                {activeRisk.metrics.map((m, idx) => (
-                  <li key={idx}>⚠️ {m}</li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Reason */}
-            <div className="engine-result-card">
-              <span className="engine-result-label">🔍 Root Cause Diagnosis</span>
-              <p className="engine-result-value">{activeRisk.reason}</p>
-            </div>
-
-            {/* Actions list */}
-            <div className="engine-result-card">
-              <span className="engine-result-label">📋 Recommended Corrective Actions</span>
-              <ol className="resolution-steps" style={{ paddingLeft: '1.25rem' }}>
-                {activeRisk.actions.map((act, idx) => (
-                  <li key={idx} className="engine-result-value" style={{ marginTop: '4px' }}>
-                    {act.includes(':') ? (
-                      <>
-                        <strong>{act.split(':')[0]}:</strong>
-                        {act.split(':')[1]}
-                      </>
-                    ) : act}
-                  </li>
-                ))}
-              </ol>
-            </div>
-
-            {/* Recovery projections */}
-            <div className="engine-result-card border-left-green">
-              <span className="engine-result-label" style={{ color: '#34d399' }}>🎯 Expected Recovery Plan Impact</span>
-              <span className="engine-highlight-pill recovery-pill">
-                🚀 {activeRisk.recovery}
-              </span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   )

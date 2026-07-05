@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import api from '@services/api'
 import './engine-forms.css'
 import './Schedule.css'
 
@@ -25,21 +26,24 @@ export function SchedulePage() {
   const [freq, setFreq]       = useState('Daily')
   const [channel, setChannel] = useState('WhatsApp')
   const [toastMessage, setToastMessage] = useState('')
+  const [jobs, setJobs] = useState<ScheduleJob[]>([])
+  const [logs, setLogs] = useState<LogEntry[]>([])
 
-  const [jobs, setJobs] = useState<ScheduleJob[]>([
-    { id: 1, task: 'Run Market Research', icon: '🧭', time: '09:30 AM', freq: 'Daily', channel: 'Dashboard', status: 'active' },
-    { id: 2, task: 'Model Marketing Spend', icon: '📣', time: '11:00 AM', freq: 'Weekly', channel: 'Email', status: 'active' },
-    { id: 3, task: 'Run Lead Gen Outbound Drip', icon: '⚡', time: '03:00 PM', freq: 'Daily', channel: 'WhatsApp', status: 'active' },
-  ])
+  const fetchScheduleData = async () => {
+    try {
+      const response = await api.get<{ jobs: ScheduleJob[]; logs: LogEntry[] }>('/schedule')
+      if (response.data) {
+        setJobs(response.data.jobs)
+        setLogs(response.data.logs)
+      }
+    } catch (err) {
+      console.error('Failed to load schedule data', err)
+    }
+  }
 
-  const [logs] = useState<LogEntry[]>([
-    { timestamp: '09:30:02 AM', engine: 'Strategy Engine', message: 'Autonomous market scan completed. Updated positioning model for B2B SaaS.', type: 'success' },
-    { timestamp: '09:30:15 AM', engine: 'Strategy Engine', message: 'Report compiled and sent to executive briefing feed.', type: 'info' },
-    { timestamp: '11:00:01 AM', engine: 'Marketing Engine', message: 'Marketing campaign run initiated for regional segment.', type: 'info' },
-    { timestamp: '11:00:24 AM', engine: 'Marketing Engine', message: 'Budget allocation updated: +12% focus on Instagram Reels.', type: 'success' },
-    { timestamp: '03:00:02 PM', engine: 'Lead Gen Engine', message: 'WhatsApp campaign drip triggered: 14 outbound triggers dispatched.', type: 'success' },
-    { timestamp: '03:00:10 PM', engine: 'Lead Gen Engine', message: 'Interakt API returned 100% dispatch delivery confirmation.', type: 'info' },
-  ])
+  useEffect(() => {
+    fetchScheduleData()
+  }, [])
 
   const getTaskIcon = (t: string) => {
     if (t.includes('Research')) return '🧭'
@@ -49,32 +53,50 @@ export function SchedulePage() {
     return '📊'
   }
 
-  const handleAddSchedule = (e: React.FormEvent) => {
+  const handleAddSchedule = async (e: React.FormEvent) => {
     e.preventDefault()
     const formattedTime = new Date(`2000-01-01T${time}:00`)
       .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     
-    const newJob: ScheduleJob = {
-      id: Date.now(),
-      task,
-      icon: getTaskIcon(task),
-      time: formattedTime,
-      freq,
-      channel,
-      status: 'active',
+    try {
+      const response = await api.post<ScheduleJob>('/schedule', {
+        task,
+        icon: getTaskIcon(task),
+        time: formattedTime,
+        freq,
+        channel,
+      })
+
+      if (response.data) {
+        setJobs((prev) => [...prev, response.data!])
+        setToastMessage(`Successfully scheduled: ${task}`)
+        setTimeout(() => setToastMessage(''), 3000)
+      }
+    } catch (err) {
+      console.error('Failed to schedule job', err)
     }
-
-    setJobs([...jobs, newJob])
-    setToastMessage(`Successfully scheduled: ${task}`)
-    setTimeout(() => setToastMessage(''), 3000)
   }
 
-  const handleDelete = (id: number) => {
-    setJobs(jobs.filter(j => j.id !== id))
+  const handleDelete = async (id: number) => {
+    try {
+      const response = await api.delete(`/schedule/${id}`)
+      if (response.status === 200 || !response.error) {
+        setJobs(jobs.filter(j => j.id !== id))
+      }
+    } catch (err) {
+      console.error('Failed to delete scheduled job', err)
+    }
   }
 
-  const toggleStatus = (id: number) => {
-    setJobs(jobs.map(j => j.id === id ? { ...j, status: j.status === 'active' ? 'paused' : 'active' } : j))
+  const toggleStatus = async (id: number) => {
+    try {
+      const response = await api.patch<ScheduleJob>(`/schedule/${id}/toggle`, {})
+      if (response.data) {
+        setJobs(jobs.map(j => j.id === id ? { ...j, status: response.data!.status } : j))
+      }
+    } catch (err) {
+      console.error('Failed to toggle status', err)
+    }
   }
 
   return (
@@ -103,36 +125,34 @@ export function SchedulePage() {
       <div className="engine-page-header">
         <h2 className="engine-page-title">📅 Schedule &amp; Automations</h2>
         <p className="engine-page-subtitle">
-          Configure autonomous AI sweeps, periodic model audits, and report synthesis runs
-          targeting multiple outreach channels.
+          Setup automated routines for strategy updates, marketing drips, lead processing, and audit scans.
         </p>
       </div>
 
-      <div className="engine-grid schedule-grid-container">
+      <div className="sched-layout">
 
-        {/* ---- Form Panel ---- */}
-        <div className="engine-form-panel">
-          <span className="engine-form-panel-title">Schedule AI Job / Audit</span>
-
-          <form onSubmit={handleAddSchedule} className="drawer-form">
+        {/* ---- Left: Builder Panel ---- */}
+        <div className="engine-form-panel sched-panel-left">
+          <span className="engine-form-panel-title">Create Schedule</span>
+          <form onSubmit={handleAddSchedule}>
             <div className="eng-field">
               <label className="eng-label">
                 <span className="eng-label-icon">🤖</span>
-                AI Task / Engine Trigger
+                Select Agent Action
               </label>
               <div className="eng-select-wrapper">
                 <select className="eng-select" value={task} onChange={e => setTask(e.target.value)}>
-                  <option value="Run Market Research">🧭 Run Market Research</option>
-                  <option value="Model Marketing Spend">📣 Model Marketing Spend</option>
-                  <option value="Run Lead Gen Outbound Drip">⚡ Run Lead Gen Outbound Drip</option>
-                  <option value="Synthesize Objection Playbook">💹 Synthesize Objection Playbook</option>
-                  <option value="Compute Revenue Forecasts">📊 Compute Revenue Forecasts</option>
+                  <option value="Run Market Research">Run Market Research (Strategy)</option>
+                  <option value="Model Marketing Spend">Model Marketing Spend (Marketing)</option>
+                  <option value="Run Lead Gen Outbound Drip">Run Lead Gen Outbound Drip (Lead Gen)</option>
+                  <option value="Synthesize Objection Playbook">Synthesize Objection Playbook (Sales)</option>
+                  <option value="Audit Safety Stock Levels">Audit Safety Stock Levels (Analytics)</option>
                 </select>
               </div>
             </div>
 
-            <div className="form-group-row">
-              <div className="eng-field flex-1">
+            <div className="sched-row-2">
+              <div className="eng-field">
                 <label className="eng-label">
                   <span className="eng-label-icon">⏰</span>
                   Time
@@ -142,11 +162,10 @@ export function SchedulePage() {
                   className="eng-input"
                   value={time}
                   onChange={e => setTime(e.target.value)}
-                  required
                 />
               </div>
 
-              <div className="eng-field flex-1">
+              <div className="eng-field">
                 <label className="eng-label">
                   <span className="eng-label-icon">🔁</span>
                   Frequency
@@ -164,84 +183,74 @@ export function SchedulePage() {
             <div className="eng-field">
               <label className="eng-label">
                 <span className="eng-label-icon">📡</span>
-                Output Destination Channel
+                Dispatch Notification Channel
               </label>
               <div className="eng-select-wrapper">
                 <select className="eng-select" value={channel} onChange={e => setChannel(e.target.value)}>
-                  <option value="WhatsApp">WhatsApp Notification</option>
+                  <option value="Dashboard">Dashboard Notification</option>
                   <option value="Email">Email Digest</option>
-                  <option value="Dashboard">Dashboard Feed Only</option>
+                  <option value="WhatsApp">WhatsApp Alert</option>
+                  <option value="Slack">Slack Webhook</option>
                 </select>
-              </div>
-              <div className="eng-chip-row">
-                <span className="eng-chip">⏰ {freq} at {time}</span>
-                <span className="eng-chip">📡 {channel} Destination</span>
               </div>
             </div>
 
             <button type="submit" className="eng-cta-btn">
-              <span className="eng-cta-btn-inner">+ Schedule Automation</span>
+              <span className="eng-cta-btn-inner">✦ Add Scheduled Job</span>
             </button>
           </form>
         </div>
 
-        {/* ---- Output Queue Panel ---- */}
-        <div className="engine-output-panel">
-          <div className="engine-output-title">
-            📅 Active Auto-Pilot Schedules
-          </div>
-
-          <div className="engine-result-stack">
-            {jobs.map(job => (
-              <div key={job.id} className="schedule-card-full glass">
-                <div className="sched-card-info">
-                  <div className="sched-card-title-row">
-                    <span className="sched-card-icon">{job.icon}</span>
-                    <span className="sched-card-title">{job.task}</span>
+        {/* ---- Right: List & Logs ---- */}
+        <div className="sched-panel-right">
+          {/* Active Jobs */}
+          <div className="engine-output-panel sched-jobs-card">
+            <div className="engine-output-title">📋 Active Automation Routines</div>
+            <div className="sched-jobs-list">
+              {jobs.length === 0 ? (
+                <div className="sched-empty">No active automated jobs.</div>
+              ) : (
+                jobs.map(job => (
+                  <div key={job.id} className={`sched-job-item glass ${job.status === 'paused' ? 'paused' : ''}`}>
+                    <div className="job-info">
+                      <span className="job-icon">{job.icon}</span>
+                      <div className="job-meta">
+                        <span className="job-task">{job.task}</span>
+                        <span className="job-sub">
+                          ⏰ {job.time} ({job.freq}) • 📡 {job.channel}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="job-actions">
+                      <button
+                        className={`btn-pause-job ${job.status === 'paused' ? 'resume' : ''}`}
+                        onClick={() => toggleStatus(job.id)}
+                      >
+                        {job.status === 'paused' ? '▶ Resume' : '⏸ Pause'}
+                      </button>
+                      <button className="btn-delete-job" onClick={() => handleDelete(job.id)}>
+                        🗑
+                      </button>
+                    </div>
                   </div>
-                  <div className="sched-card-badges">
-                    <span className="sched-badge">⏰ {job.time}</span>
-                    <span className="sched-badge">🔁 {job.freq}</span>
-                    <span className="sched-badge">📡 {job.channel}</span>
-                  </div>
-                </div>
-                <div className="sched-card-actions">
-                  <button 
-                    className={`sched-status-toggle ${job.status}`}
-                    onClick={() => toggleStatus(job.id)}
-                    title={job.status === 'active' ? 'Pause Automation' : 'Resume Automation'}
-                  >
-                    {job.status === 'active' ? '⏸' : '▶'}
-                  </button>
-                  <button 
-                    className="sched-delete"
-                    onClick={() => handleDelete(job.id)}
-                    title="Remove Schedule"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Console logs */}
-          <div className="console-panel glass">
-            <div className="console-header">
-              <span>🖥️ System Automation Console Log</span>
-              <span className="console-blink" />
+                ))
+              )}
             </div>
-            <div className="console-body">
+          </div>
+
+          {/* System logs */}
+          <div className="engine-output-panel sched-logs-card">
+            <div className="engine-output-title">📰 Automation Execution Logs</div>
+            <div className="sched-logs-list">
               {logs.map((log, i) => (
-                <div key={i} className={`console-row ${log.type}`}>
-                  <span className="console-time">[{log.timestamp}]</span>
-                  <span className="console-engine">[{log.engine}]</span>
-                  <span className="console-msg">{log.message}</span>
+                <div key={i} className="sched-log-row">
+                  <span className="log-time">[{log.timestamp}]</span>
+                  <span className={`log-badge badge-${log.type}`}>{log.engine}</span>
+                  <span className="log-msg">{log.message}</span>
                 </div>
               ))}
             </div>
           </div>
-
         </div>
 
       </div>
