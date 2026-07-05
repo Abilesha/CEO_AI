@@ -118,6 +118,8 @@
   border: none !important;
   border-radius: 0 !important;
   background: rgba(255, 255, 255, 0.02) !important;
+  color: var(--color-text-primary) !important;
+  padding: var(--space-3) var(--space-4) !important;
 }
 
 .chat-send-btn {
@@ -142,4 +144,186 @@
   font-size: var(--text-sm);
   color: var(--color-text-primary);
   line-height: 1.5;
+}
+
+/* ---- Chart Styles inside Chat Window ---- */
+.chat-bubble-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 85%;
+}
+
+.chat-bubble-wrapper.user {
+  align-items: flex-end;
+}
+
+.chat-bubble-wrapper.bot {
+  align-items: flex-start;
+}
+
+.custom-chart {
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: rgba(18, 18, 31, 0.6);
+  border: 1px solid var(--color-border);
+  width: 100%;
+  min-width: 320px;
+  max-width: 440px;
+  box-shadow: var(--shadow-md);
+}
+
+.chart-title {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semi);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: var(--space-2);
+}
+
+/* Bar Chart */
+.bar-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.bar-label {
+  width: 85px;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bar-track-group {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bar-track-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  position: relative;
+  height: 18px;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: var(--radius-sm);
+  transition: width 1s ease-out;
+}
+
+.bar-value {
+  font-size: 10px;
+  color: var(--color-text-primary);
+  font-weight: var(--weight-medium);
+  position: absolute;
+  right: 6px;
+}
+
+/* Pie Chart */
+.pie-layout {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.pie-svg-wrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+}
+
+.pie-svg {
+  transform: rotate(-90deg);
+  border-radius: 50%;
+}
+
+.pie-segment {
+  transition: stroke-dasharray 0.5s ease;
+}
+
+.pie-center-hole {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+}
+
+.pie-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-grow: 1;
+}
+
+.pie-legend-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 11px;
+}
+
+.pie-legend-label {
+  color: var(--color-text-secondary);
+  flex-grow: 1;
+}
+
+.pie-legend-val {
+  color: var(--color-text-primary);
+  font-weight: var(--weight-medium);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-text {
+  font-size: 10px;
+  color: var(--color-text-secondary);
+}
+
+.chart-legend {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  justify-content: center;
+}
+
+/* Keyframes */
+@keyframes growWidth {
+  from { width: 0; }
+}
+
+.animate-grow-width {
+  animation: growWidth 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }

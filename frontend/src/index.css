@@ -285,6 +285,24 @@ img, svg {
   border-radius: var(--radius-sm);
 }
 
+/* --- Form Fields --- */
+.form-input {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary) !important;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  outline: none;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  transition: all var(--transition-fast);
+}
+
+.form-input:focus {
+  border-color: var(--color-primary-light);
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.15);
+}
+
 /* --- Responsive Grid --- */
 .grid-auto {
   display: grid;

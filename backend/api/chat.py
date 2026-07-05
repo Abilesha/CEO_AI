@@ -140,7 +140,7 @@ def _fallback_response(user_msg: str) -> str:
 
 @router.post("", response_model=ChatResponse, summary="Chat with CEO AI")
 async def chat(body: ChatRequest):
-    """Send a message and receive an AI-generated response."""
+    """Send a message and receive an AI-generated response using LangGraph."""
     session_id = body.session_id or str(uuid.uuid4())
 
     if session_id not in _sessions:
@@ -148,9 +148,13 @@ async def chat(body: ChatRequest):
 
     _sessions[session_id].append({"role": "user", "content": body.message})
 
-    # Keep context window manageable (system + last 20 messages)
-    history = [_sessions[session_id][0]] + _sessions[session_id][-20:]
-    reply = await call_openrouter(history)
+    # Keep context window manageable
+    history = [m for m in _sessions[session_id] if m["role"] != "system"]
+    history = history[-20:]
+
+    # Invoke the LangGraph workflow
+    from services.langgraph_chat import run_chat_workflow
+    reply = await run_chat_workflow(history)
 
     _sessions[session_id].append({"role": "assistant", "content": reply})
 
