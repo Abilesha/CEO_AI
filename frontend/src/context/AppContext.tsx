@@ -97,15 +97,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    const {
-      data: { session: currentSession },
-    } = await supabase.auth.getSession()
+    if (!supabase) return;
+    try {
+      const {
+        data: { session: currentSession },
+      } = await supabase.auth.getSession()
 
-    setSession(currentSession)
-    setUser(currentSession?.user ? mapSupabaseUser(currentSession.user) : null)
+      setSession(currentSession)
+      setUser(currentSession?.user ? mapSupabaseUser(currentSession.user) : null)
+    } catch (e) {
+      console.error(e);
+    }
   }, [])
 
   useEffect(() => {
+    // If no supabase keys configured, auto-enable demo mode so user doesn't get stuck
+    if (!supabase) {
+      localStorage.setItem('demo_mode', 'true');
+      localStorage.setItem('demo_user_email', 'subasree8606@gmail.com');
+    }
+
     // Initialise session
     if (localStorage.getItem('demo_mode') === 'true') {
       const email = localStorage.getItem('demo_user_email') || 'subasree8606@gmail.com';
@@ -135,22 +146,28 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
-      setSession(s)
-      setUser(s?.user ? mapSupabaseUser(s.user) : null)
+    if (supabase) {
+      supabase.auth.getSession().then(({ data: { session: s } }) => {
+        setSession(s)
+        setUser(s?.user ? mapSupabaseUser(s.user) : null)
+        setIsLoading(false)
+      }).catch(() => {
+        setIsLoading(false)
+      })
+
+      // Subscribe to auth state changes
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange((_event, s) => {
+        if (localStorage.getItem('demo_mode') === 'true') return
+        setSession(s)
+        setUser(s?.user ? mapSupabaseUser(s.user) : null)
+      })
+
+      return () => subscription.unsubscribe()
+    } else {
       setIsLoading(false)
-    })
-
-    // Subscribe to auth state changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, s) => {
-      if (localStorage.getItem('demo_mode') === 'true') return
-      setSession(s)
-      setUser(s?.user ? mapSupabaseUser(s.user) : null)
-    })
-
-    return () => subscription.unsubscribe()
+    }
   }, [])
 
   // Apply theme to document root
