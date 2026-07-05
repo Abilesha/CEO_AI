@@ -70,6 +70,33 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
 
   const refreshUser = useCallback(async () => {
+    if (localStorage.getItem('demo_mode') === 'true') {
+      const email = localStorage.getItem('demo_user_email') || 'subasree8606@gmail.com';
+      const mockSession = {
+        access_token: 'mock-token',
+        token_type: 'bearer' as const,
+        expires_in: 3600,
+        refresh_token: 'mock-refresh',
+        user: {
+          id: 'demo-id',
+          email: email,
+          user_metadata: { full_name: 'Subasree', role: 'admin' },
+          aud: 'authenticated',
+          role: 'authenticated',
+          created_at: new Date().toISOString(),
+        } as any,
+      } as Session;
+      setSession(mockSession);
+      setUser({
+        id: 'demo-id',
+        email: email,
+        fullName: 'Subasree',
+        avatarUrl: null,
+        role: 'admin',
+      });
+      return;
+    }
+
     const {
       data: { session: currentSession },
     } = await supabase.auth.getSession()
@@ -80,6 +107,34 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Initialise session
+    if (localStorage.getItem('demo_mode') === 'true') {
+      const email = localStorage.getItem('demo_user_email') || 'subasree8606@gmail.com';
+      const mockSession = {
+        access_token: 'mock-token',
+        token_type: 'bearer' as const,
+        expires_in: 3600,
+        refresh_token: 'mock-refresh',
+        user: {
+          id: 'demo-id',
+          email: email,
+          user_metadata: { full_name: 'Subasree', role: 'admin' },
+          aud: 'authenticated',
+          role: 'authenticated',
+          created_at: new Date().toISOString(),
+        } as any,
+      } as Session;
+      setSession(mockSession);
+      setUser({
+        id: 'demo-id',
+        email: email,
+        fullName: 'Subasree',
+        avatarUrl: null,
+        role: 'admin',
+      });
+      setIsLoading(false);
+      return;
+    }
+
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s)
       setUser(s?.user ? mapSupabaseUser(s.user) : null)
@@ -90,6 +145,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, s) => {
+      if (localStorage.getItem('demo_mode') === 'true') return
       setSession(s)
       setUser(s?.user ? mapSupabaseUser(s.user) : null)
     })

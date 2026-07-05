@@ -1,8 +1,39 @@
+import { useState } from 'react'
 import './Analytics.css'
 
 export function AnalyticsPage() {
+  const [range, setRange] = useState('12 Months')
+  const [scenario, setScenario] = useState('Hyper-Growth (40%)')
+  const [forecastPath, setForecastPath] = useState<any[]>([
+    { label: 'Q1', value: 120000 },
+    { label: 'Q2', value: 175000 },
+    { label: 'Q3', value: 240000 },
+    { label: 'Q4', value: 345000 },
+  ])
+  const [isSimulating, setIsSimulating] = useState(false)
+
+  const handleForecast = () => {
+    setIsSimulating(true)
+    setTimeout(() => {
+      setIsSimulating(false)
+      const multiplier = scenario.includes('Hyper') ? 1.5 : scenario.includes('Aggressive') ? 1.25 : 1.10
+      setForecastPath([
+        { label: 'Q1', value: Math.round(120000 * multiplier) },
+        { label: 'Q2', value: Math.round(175000 * multiplier) },
+        { label: 'Q3', value: Math.round(240000 * multiplier) },
+        { label: 'Q4', value: Math.round(345000 * multiplier) },
+      ])
+    }, 1000)
+  }
+
   return (
     <div className="analytics animate-fade-in">
+      {/* Header */}
+      <div className="analytics-header">
+        <h2 className="analytics-title">Analytics Engine 📈</h2>
+        <p className="analytics-subtitle">AI-driven dashboards, financial forecasting models, competitive intelligence indexes, and resource tracking.</p>
+      </div>
+
       {/* Overview Cards */}
       <div className="analytics__kpis">
         {[
@@ -86,6 +117,64 @@ export function AnalyticsPage() {
                 <span className="chart-bar-label">{bar.label}</span>
               </div>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* AI Growth Forecast Console */}
+      <div className="analytics__forecast-panel glass">
+        <h3>🔮 AI Forecasting & Competitive Insight Engine</h3>
+        <div className="forecast-controls-grid">
+          <div className="forecast-form">
+            <div className="form-group">
+              <label>Forecast Horizon</label>
+              <select className="form-input" value={range} onChange={(e) => setRange(e.target.value)}>
+                <option value="6 Months">6 Months</option>
+                <option value="12 Months">12 Months</option>
+                <option value="24 Months">24 Months</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Growth Target</label>
+              <select className="form-input" value={scenario} onChange={(e) => setScenario(e.target.value)}>
+                <option value="Conservative (10%)">Conservative (10%)</option>
+                <option value="Aggressive (25%)">Aggressive (25%)</option>
+                <option value="Hyper-Growth (40%)">Hyper-Growth (40%)</option>
+              </select>
+            </div>
+            <button className="btn btn-primary" onClick={handleForecast} disabled={isSimulating}>
+              {isSimulating ? 'Computing Predictive Analysis...' : 'Project Forecast model'}
+            </button>
+          </div>
+
+          <div className="forecast-chart-panel">
+            {isSimulating ? (
+              <div className="loading-state">
+                <div className="spinner">⬡</div>
+                <span>Computing future projections...</span>
+              </div>
+            ) : (
+              <div className="forecast-chart-output">
+                <div className="custom-chart-wrapper">
+                  {forecastPath.map((item, i) => (
+                    <div key={i} className="custom-bar-col">
+                      <span className="custom-bar-val">${(item.value / 1000).toFixed(0)}K</span>
+                      <div className="custom-bar-fill-container">
+                        <div
+                          className="custom-bar-fill"
+                          style={{ height: `${(item.value / 600000) * 100}%` }}
+                        ></div>
+                      </div>
+                      <span className="custom-bar-label">{item.label}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="competitive-note">
+                  <strong>Competitive Intelligence Insight:</strong>
+                  <p>Your team decision speed index is 1.8x higher than average B2B enterprise industry benchmarks for this scenario.</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

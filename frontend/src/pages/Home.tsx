@@ -1,12 +1,7 @@
-/**
- * pages/Home.tsx
- * --------------
- * CEO AI — Dashboard homepage.
- * Displays KPI cards, quick actions, and activity feed.
- */
-
+import { useAppContext } from '@context/AppContext'
 import './Home.css'
 
+/* ---- KPI Data ---- */
 const KPI_CARDS = [
   {
     id: 'revenue',
@@ -14,8 +9,10 @@ const KPI_CARDS = [
     value: '$4.2M',
     change: '+18.4%',
     positive: true,
-    icon: '◈',
-    gradient: 'linear-gradient(135deg, #8b5cf6, #6d28d9)',
+    icon: '💰',
+    gradient: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
+    glow: 'rgba(139,92,246,0.35)',
+    sparkline: [40, 55, 48, 70, 62, 80, 75, 95, 88, 100],
   },
   {
     id: 'decisions',
@@ -23,8 +20,10 @@ const KPI_CARDS = [
     value: '1,284',
     change: '+9.2%',
     positive: true,
-    icon: '⬡',
-    gradient: 'linear-gradient(135deg, #06b6d4, #0284c7)',
+    icon: '🧠',
+    gradient: 'linear-gradient(135deg, #06b6d4 0%, #0284c7 100%)',
+    glow: 'rgba(6,182,212,0.35)',
+    sparkline: [30, 45, 40, 55, 50, 65, 60, 78, 72, 88],
   },
   {
     id: 'efficiency',
@@ -32,8 +31,10 @@ const KPI_CARDS = [
     value: '94.7%',
     change: '+3.1%',
     positive: true,
-    icon: '◎',
-    gradient: 'linear-gradient(135deg, #10b981, #059669)',
+    icon: '⚡',
+    gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+    glow: 'rgba(16,185,129,0.35)',
+    sparkline: [60, 65, 70, 68, 75, 78, 80, 85, 90, 95],
   },
   {
     id: 'risk',
@@ -41,8 +42,10 @@ const KPI_CARDS = [
     value: '2.1',
     change: '-0.4',
     positive: false,
-    icon: '◑',
-    gradient: 'linear-gradient(135deg, #f59e0b, #d97706)',
+    icon: '🛡️',
+    gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+    glow: 'rgba(245,158,11,0.35)',
+    sparkline: [80, 70, 75, 65, 60, 55, 50, 45, 40, 35],
   },
 ]
 
@@ -54,6 +57,7 @@ const INSIGHTS = [
     category: 'Revenue',
     priority: 'high',
     time: '2 hours ago',
+    icon: '💎',
   },
   {
     id: '2',
@@ -62,6 +66,7 @@ const INSIGHTS = [
     category: 'Operations',
     priority: 'critical',
     time: '4 hours ago',
+    icon: '⚠️',
   },
   {
     id: '3',
@@ -70,6 +75,7 @@ const INSIGHTS = [
     category: 'HR',
     priority: 'medium',
     time: '6 hours ago',
+    icon: '🚀',
   },
 ]
 
@@ -80,17 +86,53 @@ const PRIORITY_BADGE: Record<string, string> = {
   low: 'badge-accent',
 }
 
+/* Mini sparkline SVG */
+function Sparkline({ data, color }: { data: number[]; color: string }) {
+  const max = Math.max(...data)
+  const w = 80
+  const h = 32
+  const pts = data
+    .map((v, i) => `${(i / (data.length - 1)) * w},${h - (v / max) * h}`)
+    .join(' ')
+  return (
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} fill="none">
+      <polyline
+        points={pts}
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity="0.85"
+      />
+      <polyline
+        points={`0,${h} ${pts} ${w},${h}`}
+        fill={color}
+        opacity="0.08"
+        strokeWidth="0"
+      />
+    </svg>
+  )
+}
+
 export function HomePage() {
+  const { user } = useAppContext()
+
+  const hour = new Date().getHours()
+  const greeting =
+    hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
+
   return (
     <div className="home">
-      {/* ---- Hero Section ---- */}
+
+      {/* ---- Hero ---- */}
       <section className="home__hero animate-fade-in">
         <div className="home__greeting">
           <span className="badge badge-accent home__greeting-badge">
-            ● AI Active
+            <span className="live-dot" /> AI Active
           </span>
           <h1 className="home__title">
-            Good morning, <span className="gradient-text">Executive</span> 👋
+            {greeting},{' '}
+            <span className="gradient-text">{user?.fullName || 'Subasree'}</span> 👋
           </h1>
           <p className="home__subtitle">
             Your AI has processed <strong>48 signals</strong> overnight.
@@ -114,20 +156,28 @@ export function HomePage() {
             key={card.id}
             className="kpi-card glass"
             id={`kpi-card-${card.id}`}
-            style={{ animationDelay: `${i * 80}ms` }}
+            style={{
+              animationDelay: `${i * 80}ms`,
+              '--kpi-glow': card.glow,
+            } as React.CSSProperties}
           >
             <div className="kpi-card__header">
               <span className="kpi-card__label">{card.label}</span>
-              <div
-                className="kpi-card__icon"
-                style={{ background: card.gradient }}
-              >
+              <div className="kpi-card__icon" style={{ background: card.gradient }}>
                 {card.icon}
               </div>
             </div>
             <div className="kpi-card__value">{card.value}</div>
-            <div className={`kpi-card__change ${card.positive ? 'positive' : 'negative'}`}>
-              {card.positive ? '↑' : '↓'} {card.change} vs last month
+            <div className="kpi-card__footer">
+              <div className={`kpi-card__change ${card.positive ? 'positive' : 'negative'}`}>
+                {card.positive ? '↑' : '↓'} {card.change} vs last month
+              </div>
+              <Sparkline
+                data={card.sparkline}
+                color={card.gradient.includes('#8b5cf6') ? '#a78bfa' :
+                  card.gradient.includes('#06b6d4') ? '#22d3ee' :
+                  card.gradient.includes('#10b981') ? '#34d399' : '#fbbf24'}
+              />
             </div>
           </div>
         ))}
@@ -135,10 +185,11 @@ export function HomePage() {
 
       {/* ---- Main Grid ---- */}
       <section className="home__grid">
+
         {/* AI Insights */}
         <div className="home__panel glass" id="insights-panel">
           <div className="home__panel-header">
-            <h2 className="home__panel-title">AI Insights</h2>
+            <h2 className="home__panel-title">🔍 AI Insights</h2>
             <button className="btn btn-ghost home__panel-action" id="insights-view-all-btn">
               View all →
             </button>
@@ -147,6 +198,7 @@ export function HomePage() {
             {INSIGHTS.map((insight) => (
               <div key={insight.id} className="insight-item" id={`insight-${insight.id}`}>
                 <div className="insight-item__meta">
+                  <span className="insight-item__emoji">{insight.icon}</span>
                   <span className={`badge ${PRIORITY_BADGE[insight.priority]}`}>
                     {insight.priority}
                   </span>
@@ -168,46 +220,82 @@ export function HomePage() {
           </div>
         </div>
 
-        {/* Quick Actions */}
+        {/* Right side column */}
         <div className="home__side">
-          <div className="home__panel glass" id="quick-actions-panel">
+
+          {/* Activity Feed */}
+          <div className="home__panel glass" id="activity-feed-panel">
             <div className="home__panel-header">
-              <h2 className="home__panel-title">Quick Actions</h2>
+              <h2 className="home__panel-title">⚙️ Quick Actions</h2>
             </div>
             <div className="quick-actions">
               {[
-                { label: 'Generate Report', icon: '▦', id: 'qa-report' },
-                { label: 'Analyse Market',  icon: '◎', id: 'qa-market' },
-                { label: 'Review Pipeline', icon: '◈', id: 'qa-pipeline' },
-                { label: 'Team Digest',     icon: '◑', id: 'qa-team' },
+                { label: 'Generate Report', icon: '📄', id: 'qa-report', color: '#8b5cf6' },
+                { label: 'Analyse Market',  icon: '🌐', id: 'qa-market', color: '#06b6d4' },
+                { label: 'Review Pipeline', icon: '🔗', id: 'qa-pipeline', color: '#10b981' },
+                { label: 'Team Digest',     icon: '👥', id: 'qa-team', color: '#f59e0b' },
               ].map((action) => (
                 <button key={action.id} id={action.id} className="quick-action-btn glass">
-                  <span className="quick-action-btn__icon">{action.icon}</span>
+                  <span className="quick-action-btn__icon" style={{ color: action.color }}>{action.icon}</span>
                   <span className="quick-action-btn__label">{action.label}</span>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* AI Status */}
-          <div className="home__panel glass ai-status-panel" id="ai-status-panel">
-            <h2 className="home__panel-title">AI Status</h2>
-            <div className="ai-status">
+          {/* AI Engine Health Monitor */}
+          <div className="home__panel glass engine-health-panel" id="ai-status-panel">
+            <h2 className="home__panel-title">🤖 Engine Health</h2>
+            <div className="engine-health-grid">
+              {[
+                { name: 'Strategy',   color: '#a78bfa', pct: 97 },
+                { name: 'Marketing',  color: '#f472b6', pct: 88 },
+                { name: 'Lead Gen',   color: '#fbbf24', pct: 92 },
+                { name: 'Sales',      color: '#34d399', pct: 95 },
+                { name: 'Analytics',  color: '#22d3ee', pct: 99 },
+                { name: 'CRM',        color: '#fb923c', pct: 84 },
+              ].map((eng) => (
+                <div key={eng.name} className="engine-health-row">
+                  <div className="engine-health-row__label">
+                    <span className="engine-dot" style={{ background: eng.color }} />
+                    <span>{eng.name}</span>
+                  </div>
+                  <div className="engine-health-bar">
+                    <div
+                      className="engine-health-bar__fill"
+                      style={{
+                        width: `${eng.pct}%`,
+                        background: `linear-gradient(90deg, ${eng.color}aa, ${eng.color})`,
+                        boxShadow: `0 0 8px ${eng.color}55`,
+                      }}
+                    />
+                  </div>
+                  <span className="engine-health-pct">{eng.pct}%</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Live Ticker */}
+          <div className="home__panel glass live-ticker-panel" id="live-ticker-panel">
+            <h2 className="home__panel-title">📡 Live Data Feed</h2>
+            <div className="ticker-list">
               {[
                 { label: 'Data Sources',      value: '24 connected', ok: true },
                 { label: 'Models Active',     value: '3 / 3',        ok: true },
                 { label: 'Last Sync',         value: '2 min ago',    ok: true },
                 { label: 'Pending Decisions', value: '7 items',      ok: false },
+                { label: 'API Latency',       value: '34 ms',        ok: true },
               ].map((item, i) => (
-                <div key={i} className="ai-status__row">
-                  <span className="ai-status__label">{item.label}</span>
-                  <span className={`ai-status__value ${item.ok ? 'ok' : 'warn'}`}>
-                    {item.value}
-                  </span>
+                <div key={i} className="ticker-row">
+                  <span className="ticker-dot" style={{ background: item.ok ? '#10b981' : '#f59e0b' }} />
+                  <span className="ticker-label">{item.label}</span>
+                  <span className={`ticker-value ${item.ok ? 'ok' : 'warn'}`}>{item.value}</span>
                 </div>
               ))}
             </div>
           </div>
+
         </div>
       </section>
     </div>
